@@ -70,6 +70,7 @@
     <main class="section-wrapper">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb pt-1 py-1 bg-info-subtle" style="font-size: small;">
+
                 <li class="breadcrumb-item ms-2"><a href="/shop_mvc/index.php" class=" text-decoration-none"><i
                             class="fa fa-house text-black link-primary"></i></a></li>
 
@@ -101,16 +102,13 @@
                 </div>
 
                 <div class="col-lg-6 col-md-6 thongtinsp">
-
                     <h4 class="text-muted mt-2" id="product-name">Đang tải tên sản phẩm...</h4>
-
                     <div class="price1">
                         <div style="display: inline-flex;">
                             <h4 class="me-1" style="color: #ff0000;" id="product-price">...</h4>
                             <p style="font-weight: bold;font-size:18px;">đ</p>
                         </div>
                     </div>
-
                     <form action="">
                         <div class="row mb-3">
                             <div class="col-12">
@@ -119,7 +117,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-12 col-md-6 d-flex">
                                 <span class="input-group-text">Số lượng</span>
@@ -150,27 +147,22 @@
                     </div>
 
                     <div class="container mt-3">
-                        <div class="d-flex ...">
-                            <a href="#"><img src="../images/chitietsp/lienquan/1.jpg" ...></a>
-                            <a href="#"><img src="../images/chitietsp/lienquan/2.jpg" ...></a>
-                            <a href="#"><img src="../images/chitietsp/lienquan/3.jpg" ...></a>
+                        <div id="related-products-container"
+                            class="d-flex align-items-center justify-content-center pt-3 py-3  border border-light rounded-2 flex-row bg-body-tertiary">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </main>
 
     <script>
-        // Chạy khi trang đã tải xong
         document.addEventListener('DOMContentLoaded', () => {
 
-            // 1. Lấy ID sản phẩm từ URL (ví dụ: ?id=2)
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
 
-            // Lấy các element để đổ dữ liệu
+            // Lấy các element
             const breadcrumbName = document.getElementById('breadcrumb-name');
             const productName = document.getElementById('product-name');
             const productPrice = document.getElementById('product-price');
@@ -178,27 +170,25 @@
             const galleryThumb = document.getElementById('gallery-thumbnail');
             const galleryMain = document.getElementById('gallery-main');
             const galleryMobile = document.getElementById('gallery-mobile');
-            const productVariantsSelect = document.getElementById('product-variants'); // Select Size/Màu
-
-            // (Nút giỏ hàng - Giai đoạn 3)
+            const productVariantsSelect = document.getElementById('product-variants');
             const addToCartBtn = document.getElementById('add-to-cart-btn');
             const addToCartBtnMobile = document.getElementById('add-to-cart-btn-mobile');
+
+            // (Lấy element cho sản phẩm liên quan)
+            const relatedContainer = document.getElementById('related-products-container');
 
             if (!productId) {
                 productName.textContent = 'Lỗi: Không tìm thấy ID sản phẩm.';
                 return;
             }
 
-            // 2. Gọi API (Người phục vụ gọi Quầy bếp)
-            // (API này sẽ gọi SanPhamService, hàm getById() đã ghép 3 bảng)
+            // Gọi API (getById)
             fetch(`/shop_mvc/api/index.php?action=getById&id=${productId}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Lỗi mạng hoặc không tìm thấy API');
                     return response.json();
                 })
                 .then(product => {
-
-                    // 3. Kiểm tra nếu API trả về lỗi (ví dụ: không tìm thấy sp)
                     if (product.error) {
                         productName.textContent = product.error;
                         return;
@@ -210,23 +200,15 @@
                     productName.textContent = product.ten_san_pham;
 
                     // 5. Đổ dữ liệu (Biến thể - Size/Màu/Giá)
-                    // (product.list_bienthe là mảng mà Service đã ghép vào)
-                    productVariantsSelect.innerHTML = ''; // Xóa chữ "Đang tải..."
-
+                    productVariantsSelect.innerHTML = '';
                     if (product.list_bienthe && product.list_bienthe.length > 0) {
-
                         product.list_bienthe.forEach((variant, index) => {
-                            // Tạo các <option>
                             const optionText = `${variant.ten_bienthe} - (${Number(variant.gia).toLocaleString('vi-VN')} đ) - (Còn: ${variant.so_luong_ton})`;
-                            const option = new Option(optionText, variant.id); // value của option là 'bienthe_id'
-
-                            // Thêm data-* để JS (Giai đoạn 3) có thể lấy giá và tồn kho
+                            const option = new Option(optionText, variant.id);
                             option.dataset.price = variant.gia;
                             option.dataset.stock = variant.so_luong_ton;
-
                             productVariantsSelect.add(option);
 
-                            // Tự động hiển thị giá của lựa chọn đầu tiên
                             if (index === 0) {
                                 productPrice.textContent = Number(variant.gia).toLocaleString('vi-VN');
                             }
@@ -244,8 +226,8 @@
                     <p>${product.mo_ta.replace(/\n/g, '<br>')}</p>
                 `;
 
-                    // 7. Đổ dữ liệu (Gallery Ảnh)
-                    // (product.list_hinhanh là mảng mà Service đã ghép vào)
+                    // 7. Đổ dữ liệu (Gallery Ảnh - 'list_hinhanh' là tên sai, đúng là 'list_chitietsanpham'?)
+                    // (Kiểm tra lại Service: Ồ, Service của mình (Step 35) đặt tên là 'list_hinhanh'. Mình sẽ giữ nguyên)
                     galleryThumb.innerHTML = '';
                     galleryMain.innerHTML = '';
                     galleryMobile.innerHTML = '';
@@ -256,33 +238,28 @@
                             const imgId = `item-${img.id}`;
                             const imgIdMobile = `item-mobile-${img.id}`;
 
-                            // Thêm vào gallery thumbnail (trái)
-                            galleryThumb.innerHTML += `
-                            <a href="#${imgId}">
-                                <img src="${imgUrl}" class="img-fluid" width="60px" height="80px" alt="thumb ${index}">
-                            </a>
-                        `;
-
-                            // Thêm vào gallery chính (giữa)
-                            galleryMain.innerHTML += `
-                            <div id="${imgId}">
-                                <img src="${imgUrl}" class="img-fluid" alt="${product.ten_san_pham}">
-                            </div>
-                        `;
-
-                            // Thêm vào gallery mobile (cuộn ngang)
-                            galleryMobile.innerHTML += `
-                            <div id="${imgIdMobile}" class="flex-shrink-0 me-2">
-                                <img src="${imgUrl}" class="img-fluid responsive-image" alt="mobile ${index}">
-                            </div>
-                        `;
+                            galleryThumb.innerHTML += `<a href="#${imgId}"><img src="${imgUrl}" class="img-fluid" width="60px" height="80px" alt="thumb ${index}"></a>`;
+                            galleryMain.innerHTML += `<div id="${imgId}"><img src="${imgUrl}" class="img-fluid" alt="${product.ten_san_pham}"></div>`;
+                            galleryMobile.innerHTML += `<div id="${imgIdMobile}" class="flex-shrink-0 me-2"><img src="${imgUrl}" class="img-fluid responsive-image" alt="mobile ${index}"></div>`;
                         });
                     } else {
                         galleryMain.innerHTML = '<p>Sản phẩm này chưa có ảnh.</p>';
                     }
 
-                    // 8. Cập nhật data cho nút "Thêm vào giỏ" (Giai đoạn 3)
-                    // (Sự kiện này sẽ được thêm ở Giai đoạn 3)
+                    // 8. (MỚI) Đổ dữ liệu (Sản phẩm liên quan)
+                    relatedContainer.innerHTML = '';
+                    if (product.list_lienquan && product.list_lienquan.length > 0) {
+                        product.list_lienquan.forEach(related_sp => {
+                            const imgUrl = `/shop_mvc/${related_sp.anh_dai_dien.trim()}`;
+                            const linkUrl = `/shop_mvc/baocao/chitietsp_copy.php?id=${related_sp.id}`; // Trỏ về file này
+
+                            relatedContainer.innerHTML += `
+                            <a href="${linkUrl}" class="m-2">
+                                <img src="${imgUrl}" width="80px" height="100px" class="img-fluid" alt="${related_sp.ten_san_pham}">
+                            </a>
+                        `;
+                        });
+                    }
 
                 })
                 .catch(error => {
@@ -290,8 +267,7 @@
                     productName.textContent = 'Không thể tải chi tiết sản phẩm. Vui lòng kiểm tra console.';
                 });
 
-            // (SỰ KIỆN GIAI ĐOẠN 2 - NÂNG CAO)
-            // Khi người dùng thay đổi Size/Màu -> cập nhật lại giá tiền
+            // (Sự kiện 'change' cho select - đã đúng)
             productVariantsSelect.addEventListener('change', (e) => {
                 const selectedOption = e.target.options[e.target.selectedIndex];
                 const newPrice = selectedOption.dataset.price;
@@ -458,6 +434,7 @@
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/style.js"></script>
+    <script src="/shop_mvc/js/cart.js"></script>
 </body>
 
 </html>

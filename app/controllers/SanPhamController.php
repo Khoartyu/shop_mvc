@@ -1,25 +1,28 @@
 <?php
 require_once __DIR__ . "/../services/SanPhamService.php";
 
-class SanPhamController {
+class SanPhamController
+{
     private $service;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->service = new SanPhamService();
     }
 
     // 🟢 Lấy tất cả sản phẩm (Giai đoạn 1)
     // -> Hàm này của bạn ĐÃ ĐÚNG.
-    public function layTatCa() {
-        $data = $this->service->layTatCa(); 
+    public function layTatCa()
+    {
+        $data = $this->service->layTatCa();
         header('Content-Type: application/json');
         echo json_encode($data);
     }
 
     // 🟡 Lấy chi tiết 1 sản phẩm (Giai đoạn 2)
     // -> Hàm này của bạn ĐÃ ĐÚNG.
-    // Nó gọi Service, Service gọi 3 repo, trả về 1 JSON lớn.
-    public function getById() {
+    public function getById()
+    {
         $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
         if ($id <= 0) {
@@ -45,49 +48,52 @@ class SanPhamController {
      * ===============================================
      */
 
-    // 🟠 Thêm sản phẩm (chỉ thêm vào bảng `sanpham`)
-    public function them() {
-        // 1. SỬA LỖI: Chỉ lấy 3 trường của bảng 'sanpham'
+    // 🟠 Thêm sản phẩm
+    public function them()
+    {
+        // 1. SỬA: Lấy 4 trường (thêm 'danhmuc_id')
         $ten = $_POST['ten_san_pham'] ?? '';
         $mo_ta = $_POST['mo_ta'] ?? '';
-        $anh_dai_dien = $_POST['anh_dai_dien'] ?? ''; // Đã đổi tên cột
+        $anh_dai_dien = $_POST['anh_dai_dien'] ?? '';
+        $danhmuc_id = $_POST['danhmuc_id'] ?? null; // Lấy 'danhmuc_id'
 
-        // 2. SỬA LỖI: Gọi hàm service đã sửa (chỉ 3 tham số)
-        $ketQua = $this->service->themSanPham($ten, $mo_ta, $anh_dai_dien);
-        
+        // 2. SỬA: Gọi hàm service với 4 tham số
+        $ketQua = $this->service->themSanPham($ten, $mo_ta, $anh_dai_dien, $danhmuc_id);
+
         header('Content-Type: application/json');
         echo json_encode($ketQua);
     }
 
-    // 🟣 Cập nhật sản phẩm (chỉ cập nhật bảng `sanpham`)
-    public function capNhat() {
-        // 1. SỬA LỖI: Chỉ lấy các trường của bảng 'sanpham'
+    // 🟣 Cập nhật sản phẩm
+    public function capNhat()
+    {
+        // 1. SỬA: Lấy 5 trường (thêm 'danhmuc_id')
         $id = $_POST['id'] ?? 0;
         $ten = $_POST['ten_san_pham'] ?? '';
         $mo_ta = $_POST['mo_ta'] ?? '';
-        $anh_dai_dien = $_POST['anh_dai_dien'] ?? ''; // Đã đổi tên cột
+        $anh_dai_dien = $_POST['anh_dai_dien'] ?? '';
+        $danhmuc_id = $_POST['danhmuc_id'] ?? null; // Lấy 'danhmuc_id'
 
-        // 2. SỬA LỖI: Gọi hàm service đã sửa (chỉ 4 tham số)
-        $ketQua = $this->service->capNhatSanPham($id, $ten, $mo_ta, $anh_dai_dien);
-        
+        // 2. SỬA: Gọi hàm service với 5 tham số
+        $ketQua = $this->service->capNhatSanPham($id, $ten, $mo_ta, $anh_dai_dien, $danhmuc_id);
+
         header('Content-Type: application/json');
         echo json_encode($ketQua);
     }
 
     // 🔴 Xóa sản phẩm
     // -> Hàm này của bạn ĐÃ ĐÚNG.
-    public function xoa() {
+    public function xoa()
+    {
         $id = $_POST['id'] ?? 0;
         $ketQua = $this->service->xoaSanPham($id);
-        
+
         header('Content-Type: application/json');
         echo json_encode($ketQua);
     }
-    
-    // (Lưu ý: Bạn sẽ cần thêm các hàm mới ở đây cho Giai đoạn 4, ví dụ:
+     // (Lưu ý: Bạn sẽ cần thêm các hàm mới ở đây cho Giai đoạn 4, ví dụ:
     // public function themBienThe() { ... }
     // public function xoaBienThe() { ... }
     // public function uploadAnh() { ... }
     // )
 }
-?>

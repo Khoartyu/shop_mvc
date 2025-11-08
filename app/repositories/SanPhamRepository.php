@@ -15,10 +15,7 @@ class SanPhamRepository
     // 🟢 Lấy tất cả sản phẩm (Cho Giai đoạn 1)
     public function getAll()
     {
-
-        // SỬA CÂU QUERY: Thêm 1 "truy vấn con" (subquery)
-        // để lấy giá thấp nhất (MIN) từ bảng `bienthe_sanpham`
-        // và đặt tên cột đó là 'gia' (để JS cũ của bạn vẫn đọc được 'sp.gia')
+        // (Hàm này đã đúng, nó lấy MIN(gia) và trả về mảng thô (array) cho JS)
         $query = "
             SELECT 
                 s.*, 
@@ -28,18 +25,12 @@ class SanPhamRepository
             FROM sanpham s 
             ORDER BY s.ngay_cap_nhat DESC
         ";
-
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-
-        // SỬA: Trả về mảng (array) dữ liệu thô
-        // JavaScript (fetch) thích làm việc với mảng này hơn
-        // là object 'new SanPham()' (vốn đã bị thiếu 'gia')
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // 🟡 Lấy sản phẩm theo ID (Hàm này giữ nguyên như cũ)
-    // (Vì Giai đoạn 2 Service sẽ gọi nó để lấy object)
+    // 🟡 Lấy sản phẩm theo ID (Cho Giai đoạn 2)
     public function getById($id)
     {
         $query = "SELECT * FROM sanpham WHERE id = ?";
@@ -48,9 +39,11 @@ class SanPhamRepository
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            // (Hàm này vẫn trả về object SanPham như cũ)
+            // SỬA: Phải truyền 7 tham số cho Model mới
+            // (Thêm $row['danhmuc_id'])
             return new SanPham(
                 $row['id'],
+                $row['danhmuc_id'], // <-- ĐÃ THÊM
                 $row['ten_san_pham'],
                 $row['mo_ta'],
                 $row['anh_dai_dien'],
@@ -60,40 +53,73 @@ class SanPhamRepository
         }
         return null;
     }
+
     /* * ===============================================
      * CÁC HÀM CRUD (CHO GIAI ĐOẠN 4 - ADMIN)
      * ===============================================
      */
 
-    // 🟠 Thêm sản phẩm mới (chỉ thêm vào bảng `sanpham`)
-    // SỬA: Bỏ $gia, $hinh_anh, $so_luong
-    public function insert($ten_san_pham, $mo_ta, $anh_dai_dien)
+    // 🟠 Thêm sản phẩm mới
+    // SỬA: Thêm tham số $danhmuc_id
+    public function insert($ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id)
     {
-        // SỬA: Câu query chỉ insert 3 cột này
-        $query = "INSERT INTO sanpham (ten_san_pham, mo_ta, anh_dai_dien, ngay_tao, ngay_cap_nhat)
-                  VALUES (?, ?, ?, NOW(), NOW())";
+        // SỬA: Thêm cột `danhmuc_id` vào query
+        $query = "INSERT INTO sanpham (ten_san_pham, mo_ta, anh_dai_dien, danhmuc_id, ngay_tao, ngay_cap_nhat)
+                  VALUES (?, ?, ?, ?, NOW(), NOW())";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$ten_san_pham, $mo_ta, $anh_dai_dien]);
+        // SỬA: Thêm $danhmuc_id vào execute
+        return $stmt->execute([$ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id]);
     }
 
-    // 🟣 Cập nhật sản phẩm (chỉ cập nhật bảng `sanpham`)
-    // SỬA: Bỏ $gia, $hinh_anh, $so_luong
-    public function update($id, $ten_san_pham, $mo_ta, $anh_dai_dien)
+    // 🟣 Cập nhật sản phẩm
+    // SỬA: Thêm tham số $danhmuc_id
+    public function update($id, $ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id)
     {
-        // SỬA: Câu query chỉ update 3 cột này
+        // SỬA: Thêm `danhmuc_id = ?` vào query
         $query = "UPDATE sanpham 
-                  SET ten_san_pham=?, mo_ta=?, anh_dai_dien=?, ngay_cap_nhat=NOW()
+                  SET ten_san_pham=?, mo_ta=?, anh_dai_dien=?, danhmuc_id=?, ngay_cap_nhat=NOW()
                   WHERE id=?";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$ten_san_pham, $mo_ta, $anh_dai_dien, $id]);
+        // SỬA: Thêm $danhmuc_id vào execute
+        return $stmt->execute([$ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id, $id]);
     }
 
-    // 🔴 Xóa sản phẩm
+    // 🔴 Xóa sản phẩm (Hàm này giữ nguyên)
     public function delete($id)
     {
-        // Hàm này giữ nguyên. CSDL sẽ tự động xóa các biến thể và ảnh liên quan (do ON DELETE CASCADE)
         $query = "DELETE FROM sanpham WHERE id = ?";
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$id]);
+    }
+
+    // 🌟 BỔ SUNG: Hàm lấy sản phẩm liên quan (từ Step 31)
+    public function getByCategoryId($danhmuc_id, $exclude_id, $limit = 3)
+    {
+        // ... (if is_null ...)
+
+        $query = "
+            SELECT 
+                s.*, 
+                (SELECT MIN(b.gia) 
+                 FROM bienthe_sanpham b 
+                 WHERE b.sanpham_id = s.id) AS gia
+            FROM sanpham s 
+            WHERE s.danhmuc_id = ? AND s.id != ?
+            LIMIT ?
+        ";
+
+        $stmt = $this->conn->prepare($query);
+
+        // SỬA LẠI 2 DÒNG NÀY:
+        // Gán 2 tham số đầu tiên (vị trí 1 và 2)
+        $stmt->bindParam(1, $danhmuc_id);
+        $stmt->bindParam(2, $exclude_id);
+
+        // Gán tham số thứ 3 (LIMIT) và ép kiểu nó là SỐ (PDO::PARAM_INT)
+        $stmt->bindParam(3, $limit, PDO::PARAM_INT);
+
+        $stmt->execute(); // Chạy execute
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

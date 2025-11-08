@@ -323,28 +323,31 @@
                 </div>
             </div>
         </div>
-<script>
-    // Giai đoạn 1: Trang chủ (ĐÃ SỬA LỖI LAYOUT CAROUSEL)
+        <script>
+            // Giai đoạn 1: Trang chủ (ĐÃ SỬA LỖI - GIỮ NGUYÊN LAYOUT)
 
-    fetch('/shop_mvc/api/index.php?action=layTatCa')
-        .then(res => res.json())
-        .then(ds => {
-            let html = '';
-            
-            if (!Array.isArray(ds)) {
-                console.error('Lỗi API:', ds);
-                document.querySelector('.row').innerHTML = '<p class="text-danger text-center">Không tải được sản phẩm!</p>';
-                return;
-            }
+            // SỬA 1: Dùng đường dẫn tuyệt đối
+            fetch('/shop_mvc/api/index.php?action=layTatCa')
+                .then(res => res.json())
+                .then(ds => {
+                    let html = '';
 
-            ds.forEach((sp, index) => {
-                
-                // 1. Sửa tên cột
-                const dsAnh = sp.anh_dai_dien ? sp.anh_dai_dien.split(',') : ['images/placeholder.jpg'];
-                const carouselId = `carousel${index + 1}`;
+                    if (!Array.isArray(ds)) {
+                        console.error('Lỗi API:', ds);
+                        document.querySelector('.row').innerHTML = '<p class="text-danger text-center">Không tải được sản phẩm!</p>';
+                        return;
+                    }
 
-                // (Bắt đầu HTML)
-                html += `
+                    ds.forEach((sp, index) => {
+
+                        // SỬA 2: Đổi tên cột 'hinh_anh' -> 'anh_dai_dien'
+                        // (Bạn vẫn phải nhập nhiều ảnh, cách nhau bằng dấu phẩy, vào cột `anh_dai_dien`)
+                        const dsAnh = sp.anh_dai_dien ? sp.anh_dai_dien.split(',') : ['images/placeholder.jpg'];
+
+                        const carouselId = `carousel${index + 1}`;
+
+                        // (Bắt đầu HTML)
+                        html += `
     <div class="col-lg-3 col-6">
         
         <div id="${carouselId}" class="carousel carousel-dark slide" data-bs-ride="carousel">
@@ -383,16 +386,16 @@
             </span>
         </div>
     </div>
-    `; 
-            });
+    `;
+                    });
 
-            document.querySelector('.row').innerHTML = html;
-        })
-        .catch(err => {
-            console.error('Lỗi tải sản phẩm:', err);
-            document.querySelector('.row').innerHTML = '<p class="text-danger text-center">Không tải được danh sách sản phẩm!</p>';
-        });
-</script>
+                    document.querySelector('.row').innerHTML = html;
+                })
+                .catch(err => {
+                    console.error('Lỗi tải sản phẩm:', err);
+                    document.querySelector('.row').innerHTML = '<p class="text-danger text-center">Không tải được danh sách sản phẩm!</p>';
+                });
+        </script>
         <div class="container-fluid mb-5 ccr">
             <div class="text-end"><a class="btn btn-dark btn-sm">XEM THÊM CÁC SẢN PHẨM KHÁC</a></div>
         </div>
@@ -952,7 +955,7 @@
     </main>
 
     <!-- Footer -->
-   <?php include 'layout/footer.html' ?>
+    <?php include 'layout/footer.html' ?>
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/style.js"></script>
