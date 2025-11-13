@@ -14,57 +14,9 @@
 </head>
 
 <body>
-    <?php include 'layout/header.html' ?>
-    <!-- modal fade -->
-    <div class="modal fade" id="formdangnhap">
-        <div class="modal-dialog">
-            <div class="modal-content border border-0 rounded-0 ">
-                <div class="modal-header">
-                    <div class="modal-title">
-                        <h3>Đăng nhập</h3>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="loginForm">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
-                        </div>
+    <?php include 'layout/header.php' ?>
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Mật khẩu</label>
-                            <input type="password" class="form-control" id="password" required>
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember">
-                            <label class="form-check-label" for="remember">Ghi nhớ đăng nhập</label>
-                            <a href="#" class="float-end text-decoration-none">Quên mật khẩu?</a>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 mb-3">Đăng nhập</button>
-
-                        <div class="text-center mb-3">Hoặc đăng nhập bằng</div>
-
-                        <div class="social-login">
-                            <button type="button" class="btn btn-outline-dark w-100 mb-2">
-                                <i class="fab fa-google"></i> Google
-                            </button>
-                            <button type="button" class="btn btn-outline-dark w-100">
-                                <i class="fab fa-facebook"></i> Facebook
-                            </button>
-                        </div>
-                    </form>
-                    <div class="text-center mt-4">
-                        Chưa có tài khoản?
-                        <a href="baocao/dangky.html" class="text-decoration-none">Đăng ký ngay</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+ 
 
 
     <main class="section-wrapper mt-3">
@@ -363,7 +315,7 @@
                 ${dsAnh.map((anh, i) => `
                     <div class="carousel-item ${i === 0 ? 'active' : ''}">
                         
-                        <a href="/shop_mvc/baocao/chitietsp_copy.php?id=${sp.id}">
+                        <a href="/shop_mvc/baocao/chitietsp.php?id=${sp.id}">
                             <img src="/shop_mvc/${anh.trim()}" class="d-block w-100" alt="${sp.ten_san_pham}">
                         </a>
                     </div>`).join('')}
@@ -381,8 +333,8 @@
 
         <div class="price">
             <span class="mb-1">
-                <span style="text-decoration:line-through">${(sp.gia * 1.2).toLocaleString()}</span>
-                <span style="color:#ff0000">&nbsp;${Number(sp.gia).toLocaleString()}</span>
+                <span style="text-decoration:line-through">${(sp.gia * 1.2).toLocaleString()}đ</span>
+                <span style="color:#ff0000">&nbsp;${Number(sp.gia).toLocaleString()}đ</span>
             </span>
         </div>
     </div>
@@ -955,7 +907,7 @@
     </main>
 
     <!-- Footer -->
-    <?php include 'layout/footer.html' ?>
+    <?php include 'layout/footer.php' ?>
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/style.js"></script>

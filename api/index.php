@@ -1,11 +1,14 @@
 <?php
 // Tệp: /api/index.php
-
-header("Content-Type: application/json; charset=utf-8");
+require_once __DIR__ . "/../config/session.php";
+header(header: "Content-Type: application/json; charset=utf-8");
 require_once __DIR__ . "/../app/controllers/SanPhamController.php";
+require_once __DIR__ . '/../app/controllers/AdminController.php';
+require_once __DIR__ . "/../app/controllers/AuthController.php"; // [MỚI]
 
 $action = $_GET['action'] ?? '';
-
+$adminController = new AdminController();
+$authController = new AuthController(); // [MỚI]
 $controller = new SanPhamController();
 
 switch ($action) {
@@ -35,7 +38,23 @@ switch ($action) {
     case 'xoa':
         $controller->xoa();
         break;
+    
+    case 'adminKPIs': // Lấy số liệu Dashboard
+        $adminController->getDashboardData();
+        break;
 
+    case 'adminProducts': // Lấy danh sách sản phẩm quản trị
+        $adminController->getProductList();
+        break;    
+    case 'login':
+        $authController->login();
+        break;
+    case 'register': // [MỚI]
+        $authController->register();
+        break;
+    case 'logout':
+        $authController->logout();
+        break;
     default:
         http_response_code(404); // Thêm mã lỗi 404
         echo json_encode(["thong_bao" => "Không có hành động (action) hợp lệ!"]);

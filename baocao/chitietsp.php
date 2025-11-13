@@ -15,7 +15,7 @@
 
 
 <body>
-<?php include '../layout/header.html' ?>
+    <?php include '../layout/header.php' ?>
 
     <!-- modal fade -->
     <div class="modal fade" id="formdangnhap">
@@ -68,316 +68,292 @@
         </div>
     </div>
     <main class="section-wrapper">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb pt-1 py-1 bg-info-subtle" style="font-size: small;">
-                <li class="breadcrumb-item ms-2"><a href="../index.html" class=" text-decoration-none"><i
-                            class="fa fa-house text-black link-primary"></i></a></li>
-                <li class="breadcrumb-item active" aria-current="page">Quần Short No Style M158 Đen</li>
-            </ol>
-        </nav>
-        <div class="container-fluid mb-5">
-            <div class="row mt-2">
-                <div class="col-md-1 d-none d-lg-block">
-                    <div data-bs-spy="scroll" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true"
-                        class="scrollspy-example container p-0 pe-2" tabindex="0">
-                        <div style="overflow-y: scroll; height: 500px;" class="">
-                            <a href="#item1"><img src="../images/chitietsp/16.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item2"><img src="../images/chitietsp/2.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item3"><img src="../images/chitietsp/1.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item4"><img src="../images/chitietsp/18.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item5"> <img src="../images/chitietsp/3.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item6"><img src="../images/chitietsp/4.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item7"><img src="../images/chitietsp/5.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item8"><img src="../images/chitietsp/6.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item9"><img src="../images/chitietsp/7.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item10"><img src="../images/chitietsp/9.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item11"><img src="../images/chitietsp/10.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item12"><img src="../images/chitietsp/11.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item13"><img src="../images/chitietsp/12.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item14"><img src="../images/chitietsp/13.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item15"> <img src="../images/chitietsp/8.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item16"><img src="../images/chitietsp/14.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
-                            <a href="#item17"><img src="../images/chitietsp/15.jpg" class="img-fluid" width="60px"
-                                    height="80px" alt=""></a>
+<nav aria-label="breadcrumb">
+        <ol class="breadcrumb pt-1 py-1 bg-info-subtle" style="font-size: small;">
+            <li class="breadcrumb-item ms-2">
+                <a href="/shop_mvc/index.php" class="text-decoration-none">
+                    <i class="fa fa-house text-black link-primary"></i>
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page" id="breadcrumb-name">Đang tải...</li>
+        </ol>
+    </nav>
 
+    <div class="container-fluid mb-5">
+        <div class="row mt-2">
+
+            <div class="col-md-1 d-none d-lg-block">
+                <div data-bs-spy="scroll" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true"
+                    class="scrollspy-example container p-0 pe-2" tabindex="0">
+                    <div style="overflow-y: scroll; height: 500px;" class="" id="gallery-thumbnail">
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-5 col-md-6 d-none d-md-block">
-                    <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-root-margin="0px 0px -40%"
-                        data-bs-smooth-scroll="true" class="scrollspy-example bg-body-tertiary rounded-2" tabindex="0">
-                        <div class="container" style="overflow-y: scroll; height: 630px;">
-                            <div id="item1">
-                                <img src="../images/chitietsp/16.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item2">
-                                <img src="../images/chitietsp/2.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item3">
-                                <img src="../images/chitietsp/1.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item4">
-                                <img src="../images/chitietsp/18.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item5">
-                                <img src="../images/chitietsp/3.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item6">
-                                <img src="../images/chitietsp/4.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item7">
-                                <img src="../images/chitietsp/5.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item8">
-                                <img src="../images/chitietsp/6.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item9">
-                                <img src="../images/chitietsp/7.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item10">
-                                <img src="../images/chitietsp/8.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item11">
-                                <img src="../images/chitietsp/9.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item12">
-                                <img src="../images/chitietsp/10.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item13">
-                                <img src="../images/chitietsp/11.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item14">
-                                <img src="../images/chitietsp/12.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item15">
-                                <img src="../images/chitietsp/13.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item16">
-                                <img src="../images/chitietsp/14.jpg" class="img-fluid" alt="">
-                            </div>
-                            <div id="item17">
-                                <img src="../images/chitietsp/15.jpg" class="img-fluid" alt="">
-                            </div>
-
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5 col-md-6 112 d-block d-md-none">
-                    <div data-bs-spy="scroll" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true"
-                        class="scrollspy-example bg-body-tertiary rounded-2" tabindex="0">
-
-                        <!-- Cuộn ngang Bootstrap -->
-                        <div class="d-flex overflow-auto overflow-y-hidden container" style="height: 400px;">
-
-                            <div id="item1" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/16.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item2" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/2.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item3" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/1.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item4" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/18.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item5" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/3.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item6" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/4.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item7" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/5.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item8" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/6.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item9" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/7.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item10" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/8.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item11" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/9.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item12" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/10.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item13" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/11.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item14" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/12.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item15" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/13.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item16" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/14.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-                            <div id="item17" class="flex-shrink-0 me-2">
-                                <img src="../images/chitietsp/15.jpg" class="img-fluid responsive-image" alt="">
-                            </div>
-
-                            <!-- Các item còn lại tương tự -->
-
-                        </div>
-
-                    </div>
-                </div>
-
-
-
-                <div class="col-lg-6 col-md-6 thongtinsp">
-
-                    <h4 class="text-muted mt-2">Quần Short No Style M158 Đen</h4>
-                    <div class="price1">
-                        <div style="display: inline-flex;">
-                            <h4 class="text-decoration-line-through me-1" style="color: #ff0000;">257.000</h4>
-                            <p>đ</p>
-                        </div>
-                    </div>
-                    <h4 class="text-dark">Đặc Quyền Vàng VIP: Giảm Sâu 40%</h4>
-                    <div class="price1">
-                        <div style="display: inline-flex;">
-                            <h4 class="me-1" style="color: #ff0000;">154.200</h4>
-                            <p style="font-weight: bold;font-size:18px;">đ</p>
-                        </div>
-                    </div>
-                    <h4 class="text-dark" style="font-weight: 200;">Giá Hời áp dụng đến hết ngày 31/05/2025</h4>
-                    <form action="">
-                        <!-- Chọn size -->
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <select class="form-select btn-outline-danger">
-                                    <option value="1">Đen, Size S</option>
-                                    <option value="1">Đen, Size M</option>
-                                    <option value="1">Đen, Size L</option>
-                                    <option value="2">Đen, Size XL</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 col-md-6 d-flex">
-                                <span class="input-group-text">Số lượng</span>
-
-                                <select class="form-select border rounded-0">
-                                    <option value="1">1</option>
-                                    <option value="1">2</option>
-                                    <option value="1">3</option>
-                                    <option value="2">4</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-6 d-md-block d-none">
-                                <button type="submit"
-                                    class="btn btn-danger text-white w-100 btn-sm py-2 px-3 add-to-cart-btn"
-                                    data-id="sp01" data-name="Áo thun nam cổ tròn"
-                                    data-image="../images/Assets/carouselsanpham/s33.jpg" data-price="199000"
-                                    data-size="M" data-color="Đen">
-                                    THÊM VÀO GIỎ HÀNG
-                                </button>
-                            </div>
-                            <div class="col-12 col-md-6 d-block d-md-none mt-3 ">
-                                <button type="submit" class="btn btn-danger text-white w-100 btn-sm py-2 px-3">THÊM VÀO
-                                    GIỎ HÀNG</button>
-                            </div>
-                        </div>
-                        <!-- Số lượng + nút thêm -->
-
-                    </form>
-
-                    <ul class="list-group list-group-flush mt-3 ms-auto">
-                        <li class="list-group-item">Đen, Size S</li>
-                        <li class="list-group-item">Đen, Size M</li>
-                        <li class="list-group-item">Đen, Size L</li>
-                        <li class="list-group-item">Đen, Size XL</li>
-
-                    </ul>
-                    <div class="thongtinchitietsp">
-                        <div class="w-100 text-muted">Mã số: #0024126</div>
-                        <div class="w-100 fw-bold text-dark">Quần Short 5 Inch Dáng Rộng No Style M158</div>
-
-
-
-                        1. Kiểu sản phẩm: Quần short lưng thun dáng rộng.<br>
-                        2. Ưu điểm:<br>
-                        • Dáng rộng tạo cảm giác thoải mái, phóng khoáng.<br>
-                        • Vải Mesh giúp thoát ẩm nhanh, mang lại cảm giác mát mẻ.<br>
-                        • Phù hợp với nhiều phong cách, từ thể thao đến đường phố.<br>
-                        3. Chất liệu: Mesh Fabric 100% Polyester.<br>
-                        4. Kỹ thuật:<br>
-                        • Lưng thun đảm bảo sự vừa vặn và linh hoạt.<br>
-                        • Túi trước và sau tiện lợi cho việc đựng đồ dùng cá nhân.<br>
-
-
-
-
-                        <div class="mb-3">
-                            <div class="collapse" id="productDetails">
-                                • In dẻo họa tiết sắc nét, bền màu.<br>
-                                • Ép logo tạo điểm nhấn thương hiệu.<br>
-                                • Thiết kế 2 lớp với lớp trong bằng vải lưới tạo cảm giác luôn thoáng mát.<br>
-                                5. Phù hợp với ai: Những người hoạt động thể thao cần sự thoải mái và thấm hút mồ hôi,
-                                và
-                                những
-                                ai yêu thích sự thoải mái với dáng rộng và chất liệu thoáng mát.<br>
-                                6. Thuộc Bộ Sưu Tập: No Style - Bộ sưu tập với nhiều phong cách khác nhau, đem lại sự
-                                hoàn
-                                hảo
-                                cho mọi gu thời trang của bạn.<br>
-                                7. Tên thường gọi hoặc tìm kiếm về sản phẩm này: Quần short nam, quần short dáng rộng 2
-                                lớp,
-                                quần short vải lưới, quần short thể thao, quần short thoáng mát.
-
-                            </div>
-
-                            <!-- Nút toggle collapse -->
-                            <a class="btn btn-outline-secondary text-dark btn-sm" data-bs-toggle="collapse"
-                                href="#productDetails" role="button" aria-expanded="false"
-                                aria-controls="productDetails">
-                                Đọc thêm / Ẩn bớt
-                            </a>
-
-                        </div>
-                    </div>
-                    <div class="container">
-                        <div
-                            class="d-flex align-items-center justify-content-center pt-3 py-3  border border-light rounded-2 flex-row bg-body-tertiary">
-                            <a href="#"><img src="../images/chitietsp/lienquan/1.jpg" width="80px" height="100px"
-                                    class="img-fluid" alt=""></a>
-                            <a href="#"><img src="../images/chitietsp/lienquan/2.jpg" width="80px" height="100px"
-                                    class="img-fluid" alt=""></a>
-                            <a href="#"><img src="../images/chitietsp/lienquan/3.jpg" width="80px" height="100px"
-                                    class="img-fluid" alt=""></a>
-                        </div>
-
-                        </a>
-                    </div>
                 </div>
             </div>
 
+            <div class="col-lg-5 col-md-6 d-none d-md-block">
+                <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-root-margin="0px 0px -40%"
+                    data-bs-smooth-scroll="true" class="scrollspy-example bg-body-tertiary rounded-2" tabindex="0">
+                    <div class="container" style="overflow-y: scroll; height: 630px;" id="gallery-main">
+                        </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 col-md-6 112 d-block d-md-none">
+                <div data-bs-spy="scroll" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true"
+                    class="scrollspy-example bg-body-tertiary rounded-2" tabindex="0">
+                    <div class="d-flex overflow-auto overflow-y-hidden container" style="height: 400px;" id="gallery-mobile">
+                        </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 thongtinsp">
+                
+                <h4 class="text-muted mt-2" id="product-name">Đang tải tên sản phẩm...</h4>
+                
+                <div class="price1">
+                    <div style="display: inline-flex;">
+                        <h4 class="me-1" style="color: #ff0000;" id="product-price">...</h4>
+                        <p style="font-weight: bold;font-size:18px;">đ</p>
+                    </div>
+                </div>
+                
+                <form action="" onsubmit="return false;"> <div class="row mb-3">
+                        <div class="col-12">
+                            <select class="form-select btn-outline-danger" name="size" id="product-variants">
+                                <option value="">Đang tải lựa chọn...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 col-md-6 d-flex">
+                            <span class="input-group-text">Số lượng</span>
+                            <select class="form-select border rounded-0" id="product-quantity">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12 col-md-6 d-md-block d-none">
+                            <button type="button"
+                                class="btn btn-danger text-white w-100 btn-sm py-2 px-3 add-to-cart-btn"
+                                id="add-to-cart-btn">
+                                THÊM VÀO GIỎ HÀNG
+                            </button>
+                        </div>
+                        
+                        <div class="col-12 col-md-6 d-block d-md-none mt-3 ">
+                            <button type="button" class="btn btn-danger text-white w-100 btn-sm py-2 px-3" id="add-to-cart-btn-mobile">
+                                THÊM VÀO GIỎ HÀNG
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="thongtinchitietsp mt-3" id="product-description">
+                    <p>Đang tải mô tả...</p>
+                </div>
+
+                <div class="container mt-3">
+                    <h6 class="fw-bold mb-2">Sản phẩm liên quan</h6>
+                    <div id="related-products-container"
+                        class="d-flex align-items-center justify-content-center pt-3 py-3  border border-light rounded-2 flex-row bg-body-tertiary">
+                        </div>
+                </div>
+            </div>
         </div>
+    </div>
+    </main>
+
+ <script>
+    document.addEventListener('DOMContentLoaded', () => {
         
-        <!-- <div class="container-fluid mb-5 ccr">
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        // DOM Elements
+        const breadcrumbName = document.getElementById('breadcrumb-name');
+        const productName = document.getElementById('product-name');
+        const productPrice = document.getElementById('product-price');
+        const productDescription = document.getElementById('product-description');
+        const galleryThumb = document.getElementById('gallery-thumbnail');
+        const galleryMain = document.getElementById('gallery-main');
+        const galleryMobile = document.getElementById('gallery-mobile');
+        const productVariantsSelect = document.getElementById('product-variants');
+        const relatedContainer = document.getElementById('related-products-container');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        const addToCartBtnMobile = document.getElementById('add-to-cart-btn-mobile');
+
+        if (!productId) {
+            productName.textContent = 'Lỗi: Không tìm thấy ID sản phẩm.';
+            return;
+        }
+
+        // --- GỌI API ---
+        fetch(`/shop_mvc/api/index.php?action=getById&id=${productId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Lỗi mạng hoặc API');
+                return response.json();
+            })
+            .then(product => {
+                
+                if (product.error) {
+                    productName.textContent = product.error;
+                    return;
+                }
+
+                // 1. Thông tin chung
+                document.title = product.ten_san_pham;
+                breadcrumbName.textContent = product.ten_san_pham;
+                productName.textContent = product.ten_san_pham;
+
+                // 2. Biến thể (Size/Màu)
+                const variants = product.variants || product.list_bienthe;
+                productVariantsSelect.innerHTML = ''; 
+                
+                if (variants && variants.length > 0) {
+                    variants.forEach((variant, index) => {
+                        // Ghép tên hiển thị
+                        let label = '';
+                        if (variant.ten_mau) label += variant.ten_mau;
+                        if (variant.ten_kich_thuoc) label += (label ? ' - Size ' : 'Size ') + variant.ten_kich_thuoc;
+                        if (!label) label = variant.ten_bienthe; // Fallback
+
+                        const optionText = `${label} - ${Number(variant.gia).toLocaleString('vi-VN')}đ (Còn: ${variant.so_luong_ton})`;
+                        const option = new Option(optionText, variant.id);
+                        
+                        // Lưu data vào option để dùng cho Giỏ hàng
+                        option.dataset.price = variant.gia;
+                        option.dataset.stock = variant.so_luong_ton;
+                        option.dataset.name = label; 
+                        
+                        productVariantsSelect.add(option);
+                        
+                        if (index === 0) {
+                            productPrice.textContent = Number(variant.gia).toLocaleString('vi-VN');
+                        }
+                    });
+                } else {
+                    productPrice.textContent = 'Liên hệ';
+                    productVariantsSelect.add(new Option('Đang cập nhật tùy chọn', ''));
+                }
+
+                // 3. Mô tả
+                productDescription.innerHTML = `
+                    <div class="w-100 text-muted">Mã số: #${product.id}</div>
+                    <br>
+                    <p>${product.mo_ta ? product.mo_ta.replace(/\n/g, '<br>') : ''}</p>
+                `;
+
+                // 4. Gallery Ảnh
+                galleryThumb.innerHTML = '';
+                galleryMain.innerHTML = '';
+                galleryMobile.innerHTML = '';
+                
+                const images = product.list_hinhanh || [];
+                
+                if (images.length > 0) {
+                    images.forEach((img, index) => {
+                        const imgUrl = `/shop_mvc/${img.duong_dan.trim()}`;
+                        const imgId = `item-${img.id}`;
+                        const imgIdMobile = `item-mobile-${img.id}`;
+
+                        galleryThumb.innerHTML += `<a href="#${imgId}"><img src="${imgUrl}" class="img-fluid" width="60px" height="80px" alt="thumb"></a>`;
+                        galleryMain.innerHTML += `<div id="${imgId}"><img src="${imgUrl}" class="img-fluid" alt="${product.ten_san_pham}"></div>`;
+                        galleryMobile.innerHTML += `<div id="${imgIdMobile}" class="flex-shrink-0 me-2"><img src="${imgUrl}" class="img-fluid responsive-image" alt="mobile"></div>`;
+                    });
+                } else {
+                    galleryMain.innerHTML = '<p class="text-center py-5">Chưa có ảnh chi tiết</p>';
+                }
+
+                // 5. Sản phẩm liên quan
+                relatedContainer.innerHTML = '';
+                if (product.list_lienquan && product.list_lienquan.length > 0) {
+                    product.list_lienquan.forEach(related_sp => {
+                        const rawImg = related_sp.anh_dai_dien ? related_sp.anh_dai_dien.split(',')[0] : 'images/placeholder.jpg';
+                        const imgUrl = `/shop_mvc/${rawImg.trim()}`;
+                        // Link trỏ về chính trang này
+                        const linkUrl = `/shop_mvc/baocao/chitietsp.php?id=${related_sp.id}`;
+
+                        relatedContainer.innerHTML += `
+                            <a href="${linkUrl}" class="m-2" title="${related_sp.ten_san_pham}">
+                                <img src="${imgUrl}" width="80px" height="100px" class="img-fluid object-fit-cover" alt="related">
+                            </a>
+                        `;
+                    });
+                } else {
+                    relatedContainer.innerHTML = '<p class="small text-muted">Không có sản phẩm liên quan.</p>';
+                }
+
+            })
+            .catch(error => {
+                console.error('Lỗi fetch:', error);
+                productName.textContent = 'Không thể tải dữ liệu sản phẩm.';
+            });
+
+        // --- SỰ KIỆN CHANGE: Cập nhật giá ---
+        productVariantsSelect.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            if (selectedOption && selectedOption.dataset.price) {
+                const newPrice = selectedOption.dataset.price;
+                productPrice.textContent = Number(newPrice).toLocaleString('vi-VN');
+            }
+        });
+
+        // --- SỰ KIỆN CLICK: Thêm vào giỏ hàng ---
+        function handleAddToCart() {
+            const selectedOption = productVariantsSelect.options[productVariantsSelect.selectedIndex];
+            
+            if (!selectedOption || !selectedOption.value) {
+                alert('Vui lòng chọn màu sắc và kích thước!');
+                return;
+            }
+
+            const variantId = parseInt(selectedOption.value);
+            const quantity = parseInt(document.getElementById('product-quantity').value);
+            const stock = parseInt(selectedOption.dataset.stock);
+            const price = parseFloat(selectedOption.dataset.price);
+            const variantName = selectedOption.dataset.name || selectedOption.text;
+
+            if (quantity > stock) {
+                alert(`Xin lỗi, loại này chỉ còn ${stock} sản phẩm.`);
+                return;
+            }
+
+            // Lấy ảnh đại diện (ảnh đầu tiên trong gallery main)
+            const mainImg = document.querySelector('#gallery-main img');
+            const imageSrc = mainImg ? mainImg.getAttribute('src') : '/shop_mvc/images/placeholder.jpg';
+
+            // Tạo item
+            const newItem = {
+                id: variantId,          // ID Biến thể (Quan trọng)
+                productId: productId,   // ID Sản phẩm cha
+                name: `${productName.textContent} - ${variantName}`, // Tên hiển thị
+                price: price,
+                image: imageSrc,
+                quantity: quantity
+            };
+
+            // Gọi hàm từ cart.js
+            if (typeof addToCart === "function") {
+                addToCart(newItem);
+                alert('Đã thêm vào giỏ hàng thành công!');
+            } else {
+                console.error('Chưa load được file js/cart.js');
+                alert('Lỗi: Không tìm thấy chức năng giỏ hàng.');
+            }
+        }
+
+        // Gắn sự kiện
+        if(addToCartBtn) addToCartBtn.addEventListener('click', handleAddToCart);
+        if(addToCartBtnMobile) addToCartBtnMobile.addEventListener('click', handleAddToCart);
+    });
+</script>
+
+    <!-- <div class="container-fluid mb-5 ccr">
             <h5 class="text-center" style="font-weight:600;">Có Thể Bạn Quan Tâm</h5>
             <div class="row">
                 <div class="col-lg-3 col-6">
@@ -530,11 +506,12 @@
 
     </main>
     <!-- Footer -->
-<?php include '../layout/footer.html' ?>
+    <?php include '../layout/footer.php' ?>
 
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/style.js"></script>
+    <script src="/shop_mvc/js/cart.js"></script>
 </body>
 
 </html>

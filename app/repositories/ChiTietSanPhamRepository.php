@@ -1,5 +1,5 @@
 <?php
-// Tệp: /app/repositories/HinhAnhSanPhamRepository.php
+// Tệp: /app/repositories/ChiTietSanPhamRepository.php
 
 require_once __DIR__ . "/../../config/database.php";
 

@@ -15,7 +15,6 @@ class SanPhamRepository
     // 🟢 Lấy tất cả sản phẩm (Cho Giai đoạn 1)
     public function getAll()
     {
-        // (Hàm này đã đúng, nó lấy MIN(gia) và trả về mảng thô (array) cho JS)
         $query = "
             SELECT 
                 s.*, 
@@ -33,58 +32,50 @@ class SanPhamRepository
     // 🟡 Lấy sản phẩm theo ID (Cho Giai đoạn 2)
     public function getById($id)
     {
-        $query = "SELECT * FROM sanpham WHERE id = ?";
+        // JOIN bảng danhmuc để lấy tên danh mục luôn
+        $query = "
+            SELECT s.*, d.ten_danhmuc 
+            FROM sanpham s
+            LEFT JOIN danhmuc d ON s.danhmuc_id = d.id
+            WHERE s.id = ?
+        ";
         $stmt = $this->conn->prepare($query);
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            // SỬA: Phải truyền 7 tham số cho Model mới
-            // (Thêm $row['danhmuc_id'])
-            return new SanPham(
-                $row['id'],
-                $row['danhmuc_id'], // <-- ĐÃ THÊM
-                $row['ten_san_pham'],
-                $row['mo_ta'],
-                $row['anh_dai_dien'],
-                $row['ngay_tao'],
-                $row['ngay_cap_nhat']
-            );
+            // SỬA: Truyền mảng $row vào constructor của SanPham
+            // Vì Model SanPham mới nhận mảng $data
+            return new SanPham($row);
         }
         return null;
     }
 
-    /* * ===============================================
+    /* ===============================================
      * CÁC HÀM CRUD (CHO GIAI ĐOẠN 4 - ADMIN)
      * ===============================================
      */
 
     // 🟠 Thêm sản phẩm mới
-    // SỬA: Thêm tham số $danhmuc_id
     public function insert($ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id)
     {
-        // SỬA: Thêm cột `danhmuc_id` vào query
         $query = "INSERT INTO sanpham (ten_san_pham, mo_ta, anh_dai_dien, danhmuc_id, ngay_tao, ngay_cap_nhat)
                   VALUES (?, ?, ?, ?, NOW(), NOW())";
         $stmt = $this->conn->prepare($query);
-        // SỬA: Thêm $danhmuc_id vào execute
         return $stmt->execute([$ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id]);
     }
 
     // 🟣 Cập nhật sản phẩm
-    // SỬA: Thêm tham số $danhmuc_id
     public function update($id, $ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id)
     {
-        // SỬA: Thêm `danhmuc_id = ?` vào query
         $query = "UPDATE sanpham 
                   SET ten_san_pham=?, mo_ta=?, anh_dai_dien=?, danhmuc_id=?, ngay_cap_nhat=NOW()
                   WHERE id=?";
         $stmt = $this->conn->prepare($query);
-        // SỬA: Thêm $danhmuc_id vào execute
         return $stmt->execute([$ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id, $id]);
     }
 
-    // 🔴 Xóa sản phẩm (Hàm này giữ nguyên)
+    // 🔴 Xóa sản phẩm
     public function delete($id)
     {
         $query = "DELETE FROM sanpham WHERE id = ?";
@@ -92,10 +83,12 @@ class SanPhamRepository
         return $stmt->execute([$id]);
     }
 
-    // 🌟 BỔ SUNG: Hàm lấy sản phẩm liên quan (từ Step 31)
+    // 🌟 Lấy sản phẩm liên quan
     public function getByCategoryId($danhmuc_id, $exclude_id, $limit = 3)
     {
-        // ... (if is_null ...)
+        if (is_null($danhmuc_id)) {
+            return [];
+        }
 
         $query = "
             SELECT 
@@ -109,17 +102,21 @@ class SanPhamRepository
         ";
 
         $stmt = $this->conn->prepare($query);
-
-        // SỬA LẠI 2 DÒNG NÀY:
-        // Gán 2 tham số đầu tiên (vị trí 1 và 2)
         $stmt->bindParam(1, $danhmuc_id);
         $stmt->bindParam(2, $exclude_id);
-
-        // Gán tham số thứ 3 (LIMIT) và ép kiểu nó là SỐ (PDO::PARAM_INT)
         $stmt->bindParam(3, $limit, PDO::PARAM_INT);
+        $stmt->execute();
 
-        $stmt->execute(); // Chạy execute
+        // Trả về mảng thô để dễ xử lý ở Service/Controller
+        // Sau này có thể map sang object SanPham nếu muốn
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // (Tùy chọn: Convert sang object SanPham nếu cần đồng bộ)
+        // $objects = [];
+        // foreach($rows as $row) $objects[] = new SanPham($row);
+        // return $objects;
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $rows; 
     }
 }
+?>
