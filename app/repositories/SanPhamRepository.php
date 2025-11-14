@@ -12,7 +12,13 @@ class SanPhamRepository
         $this->conn = $database->connect();
     }
 
-    // 🟢 Lấy tất cả sản phẩm (Cho Giai đoạn 1)
+    // =================================================================
+    // CÁC HÀM CHO TRANG CHỦ (GIAI ĐOẠN 1)
+    // =================================================================
+
+    /**
+     * 🟢 1. Lấy tất cả sản phẩm (Kèm giá thấp nhất từ bảng biến thể)
+     */
     public function getAll()
     {
         $query = "
@@ -29,10 +35,38 @@ class SanPhamRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // 🟡 Lấy sản phẩm theo ID (Cho Giai đoạn 2)
+    /**
+     * 🟢 2. (MỚI) Lấy danh sách Banner (Slider & Quảng cáo)
+     */
+    public function getBanners()
+    {
+        // Chỉ lấy banner đang hiện (hien_thi = 1), sắp xếp theo thứ tự
+        $query = "SELECT * FROM banners WHERE hien_thi = 1 ORDER BY thu_tu ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * 🟢 3. (MỚI) Lấy danh sách Danh mục (Cho Carousel Danh mục)
+     */
+    public function getCategories()
+    {
+        $query = "SELECT * FROM danhmuc";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // =================================================================
+    // CÁC HÀM CHO TRANG CHI TIẾT (GIAI ĐOẠN 2)
+    // =================================================================
+
+    /**
+     * 🟡 4. Lấy chi tiết 1 sản phẩm (Kèm tên danh mục)
+     */
     public function getById($id)
     {
-        // JOIN bảng danhmuc để lấy tên danh mục luôn
         $query = "
             SELECT s.*, d.ten_danhmuc 
             FROM sanpham s
@@ -44,17 +78,44 @@ class SanPhamRepository
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            // SỬA: Truyền mảng $row vào constructor của SanPham
-            // Vì Model SanPham mới nhận mảng $data
+            // Truyền mảng $row vào Model SanPham mới
             return new SanPham($row);
         }
         return null;
     }
 
-    /* ===============================================
-     * CÁC HÀM CRUD (CHO GIAI ĐOẠN 4 - ADMIN)
-     * ===============================================
+    /**
+     * 🟡 5. Lấy sản phẩm liên quan (Cùng danh mục, trừ chính nó)
      */
+    public function getByCategoryId($danhmuc_id, $exclude_id, $limit = 3)
+    {
+        if (is_null($danhmuc_id)) {
+            return [];
+        }
+
+        $query = "
+            SELECT 
+                s.*, 
+                (SELECT MIN(b.gia) 
+                 FROM bienthe_sanpham b 
+                 WHERE b.sanpham_id = s.id) AS gia
+            FROM sanpham s 
+            WHERE s.danhmuc_id = ? AND s.id != ?
+            LIMIT ?
+        ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $danhmuc_id);
+        $stmt->bindParam(2, $exclude_id);
+        $stmt->bindParam(3, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // =================================================================
+    // CÁC HÀM CRUD CHO ADMIN (GIAI ĐOẠN 4)
+    // =================================================================
 
     // 🟠 Thêm sản phẩm mới
     public function insert($ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id)
@@ -81,42 +142,6 @@ class SanPhamRepository
         $query = "DELETE FROM sanpham WHERE id = ?";
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$id]);
-    }
-
-    // 🌟 Lấy sản phẩm liên quan
-    public function getByCategoryId($danhmuc_id, $exclude_id, $limit = 3)
-    {
-        if (is_null($danhmuc_id)) {
-            return [];
-        }
-
-        $query = "
-            SELECT 
-                s.*, 
-                (SELECT MIN(b.gia) 
-                 FROM bienthe_sanpham b 
-                 WHERE b.sanpham_id = s.id) AS gia
-            FROM sanpham s 
-            WHERE s.danhmuc_id = ? AND s.id != ?
-            LIMIT ?
-        ";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $danhmuc_id);
-        $stmt->bindParam(2, $exclude_id);
-        $stmt->bindParam(3, $limit, PDO::PARAM_INT);
-        $stmt->execute();
-
-        // Trả về mảng thô để dễ xử lý ở Service/Controller
-        // Sau này có thể map sang object SanPham nếu muốn
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        // (Tùy chọn: Convert sang object SanPham nếu cần đồng bộ)
-        // $objects = [];
-        // foreach($rows as $row) $objects[] = new SanPham($row);
-        // return $objects;
-
-        return $rows; 
     }
 }
 ?>

@@ -17,56 +17,7 @@
 <body>
     <?php include '../layout/header.php' ?>
 
-    <!-- modal fade -->
-    <div class="modal fade" id="formdangnhap">
-        <div class="modal-dialog">
-            <div class="modal-content border border-0 rounded-0 ">
-                <div class="modal-header">
-                    <div class="modal-title">
-                        <h3>Đăng nhập</h3>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="loginForm">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
-                        </div>
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Mật khẩu</label>
-                            <input type="password" class="form-control" id="password" required>
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember">
-                            <label class="form-check-label" for="remember">Ghi nhớ đăng nhập</label>
-                            <a href="#" class="float-end text-decoration-none">Quên mật khẩu?</a>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 mb-3">Đăng nhập</button>
-
-                        <div class="text-center mb-3">Hoặc đăng nhập bằng</div>
-
-                        <div class="social-login">
-                            <button type="button" class="btn btn-outline-dark w-100 mb-2">
-                                <i class="fab fa-google"></i> Google
-                            </button>
-                            <button type="button" class="btn btn-outline-dark w-100">
-                                <i class="fab fa-facebook"></i> Facebook
-                            </button>
-                        </div>
-                    </form>
-                    <div class="text-center mt-4">
-                        Chưa có tài khoản?
-                        <a href="dangky.html" class="text-decoration-none">Đăng ký ngay</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <main class="section-wrapper">
 <nav aria-label="breadcrumb">
         <ol class="breadcrumb pt-1 py-1 bg-info-subtle" style="font-size: small;">
