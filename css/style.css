@@ -174,9 +174,6 @@ body {
   font-size: 0.9rem;
 }
 
-
-
-
 .responsive-image {
   width: 100%;
   height: auto;
@@ -250,83 +247,182 @@ footer h4 {
 }
 
 /* Tùy chỉnh màu sắc cho Modal */
-    .modal-content {
-        border-radius: 0; /* Bo góc vuông vức sang trọng */
-    }
-    
-    /* Tab Navigation */
-    .modal-nav-tabs-custom {
-        border-bottom: 1px solid #e5e7eb;
-        margin-bottom: 25px;
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-    }
-    .modal-tab-btn {
-        background: none;
-        border: none;
-        padding: 10px 15px;
-        font-size: 1.1rem;
-        font-weight: 500;
-        color: #9ca3af; /* Xám nhạt */
-        border-bottom: 2px solid transparent;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    .modal-tab-btn:hover { 
-        color: #111827; /* Đen */
-    }
-    .modal-tab-btn.active {
-        color: #111827; /* Đen đậm */
-        border-bottom-color: #111827;
-    }
-    
-    /* Input Styles */
-    .form-control {
-        border-radius: 0;
-        border: 1px solid #d1d5db;
-        padding: 10px 15px;
-    }
-    .form-control:focus {
-        box-shadow: none;
-        border-color: #111827; /* Viền đen khi focus */
-    }
-    .input-group-text {
-        background-color: #f9fafb;
-        border-radius: 0;
-        border: 1px solid #d1d5db;
-        color: #6b7280;
-    }
+.modal-content {
+  border-radius: 0; /* Bo góc vuông vức sang trọng */
+}
 
-    /* Button Styles */
-    .btn-dark-custom {
-        background-color: #1f2937;
-        border-color: #1f2937;
-        border-radius: 0;
-        padding: 10px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-    .btn-dark-custom:hover {
-        background-color: #111827;
-        border-color: #111827;
-    }
-    
-    .btn-outline-custom {
-        border-radius: 0;
-        border: 1px solid #d1d5db;
-        color: #374151;
-    }
-    .btn-outline-custom:hover {
-        background-color: #f3f4f6;
-        color: #111827;
-    }
+/* Tab Navigation */
+.modal-nav-tabs-custom {
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+.modal-tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #9ca3af; /* Xám nhạt */
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.modal-tab-btn:hover {
+  color: #111827; /* Đen */
+}
+.modal-tab-btn.active {
+  color: #111827; /* Đen đậm */
+  border-bottom-color: #111827;
+}
 
-    .modal-tab-content.hidden-tab { display: none !important; }
-    .modal-backdrop { z-index: 1060 !important; }
-    .modal { z-index: 1070 !important; }
-    /* Thêm CSS để tránh layout bị giật khi chưa có dữ liệu */
-        .min-h-banner { min-height: 400px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; }
-        .min-h-cate { min-height: 200px; }
+/* Input Styles */
+.form-control {
+  border-radius: 0;
+  border: 1px solid #d1d5db;
+  padding: 10px 15px;
+}
+.form-control:focus {
+  box-shadow: none;
+  border-color: #111827; /* Viền đen khi focus */
+}
+.input-group-text {
+  background-color: #f9fafb;
+  border-radius: 0;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+}
+
+/* Button Styles */
+.btn-dark-custom {
+  background-color: #1f2937;
+  border-color: #1f2937;
+  border-radius: 0;
+  padding: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.btn-dark-custom:hover {
+  background-color: #111827;
+  border-color: #111827;
+}
+
+.btn-outline-custom {
+  border-radius: 0;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+.btn-outline-custom:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* --- CSS CHO MODAL ĐĂNG NHẬP/ĐĂNG KÝ --- */
+.modal-content {
+  border-radius: 0;
+}
+
+/* Tab Navigation */
+.modal-nav-tabs-custom {
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.modal-tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #9ca3af; /* Xám nhạt */
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modal-tab-btn:hover {
+  color: #111827; /* Đen */
+}
+
+.modal-tab-btn.active {
+  color: #111827; /* Đen đậm */
+  border-bottom-color: #111827;
+}
+
+/* Input Styles */
+.form-control {
+  border-radius: 0;
+  border: 1px solid #d1d5db;
+  padding: 10px 15px;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #111827; /* Viền đen khi focus */
+}
+
+.input-group-text {
+  background-color: #f9fafb;
+  border-radius: 0;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+}
+
+/* Button Styles */
+.btn-dark-custom {
+  background-color: #1f2937;
+  border-color: #1f2937;
+  border-radius: 0;
+  padding: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.btn-dark-custom:hover {
+  background-color: #111827;
+  border-color: #111827;
+}
+
+.btn-outline-custom {
+  border-radius: 0;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.btn-outline-custom:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.modal-tab-content.hidden-tab {
+  display: none !important;
+}
+
+.modal-backdrop {
+  z-index: 1060 !important;
+}
+
+.modal {
+  z-index: 1070 !important;
+}
+/* Thêm CSS để tránh layout bị giật khi chưa có dữ liệu */
+.min-h-banner {
+  min-height: 400px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.min-h-cate {
+  min-height: 200px;
+}

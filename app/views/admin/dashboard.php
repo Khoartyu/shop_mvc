@@ -408,7 +408,7 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         window.handleLogout = async () => {
             if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                 await fetchData('logout');
-                window.location.href = '/shop_mvc/index.php';
+                window.location.href = '/shop_mvc/baocao/logout.php';
             }
         };
 

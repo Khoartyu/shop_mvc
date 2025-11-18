@@ -1,4 +1,4 @@
-<?php 
+<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -8,6 +8,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,9 +17,9 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
-    
+
     <script>
-        const checkLoginString = "<?php echo $isUserLoggedIn; ?>"; 
+        const checkLoginString = "<?php echo $isUserLoggedIn; ?>";
         const isLoggedIn = (checkLoginString === "true");
     </script>
 </head>
@@ -81,13 +82,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
             </div>
         </div>
     </main>
-
-    <?php include __DIR__ . '/../layout/footer.php'; ?>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/style.js"></script>
-    
-<script>
+    <script>
         // 1. Hàm hiển thị giỏ hàng
         function renderCartPage() {
             const container = document.getElementById('cart-items-container');
@@ -95,7 +90,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
 
             // QUAN TRỌNG: Sửa key thành 'cart' cho khớp với LocalStorage của bạn
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            
+
             container.innerHTML = ''; // Xóa chữ đang tải
 
             // Nếu giỏ hàng trống
@@ -113,7 +108,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
                 let price = Number(item.price) || 0;
                 let qty = Number(item.quantity) || 0;
                 let itemTotal = price * qty;
-                
+
                 totalMoney += itemTotal;
 
                 // Xử lý ảnh (nếu link ảnh lỗi hoặc rỗng)
@@ -155,7 +150,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
         // 2. Hàm cập nhật số lượng
         function updateQuantity(index, change) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            
+
             // Ép kiểu số trước khi cộng trừ
             let newQty = (Number(cart[index].quantity) || 0) + change;
 
@@ -187,15 +182,15 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
         function updateTotals(amount) {
             const tempTotal = document.getElementById('cart-temp-total');
             const finalTotal = document.getElementById('cart-final-total');
-            if(tempTotal) tempTotal.textContent = amount.toLocaleString('vi-VN') + 'đ';
-            if(finalTotal) finalTotal.textContent = amount.toLocaleString('vi-VN') + 'đ';
+            if (tempTotal) tempTotal.textContent = amount.toLocaleString('vi-VN') + 'đ';
+            if (finalTotal) finalTotal.textContent = amount.toLocaleString('vi-VN') + 'đ';
         }
 
         // 5. Cập nhật số lượng trên Header
         function updateBadge() {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             let count = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-            
+
             const badges = document.querySelectorAll('.cart-counter');
             badges.forEach(el => el.innerText = count);
         }
@@ -204,7 +199,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
         document.getElementById('btn-checkout').addEventListener('click', function(e) {
             e.preventDefault();
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            
+
             if (cart.length === 0) {
                 alert('Giỏ hàng đang trống!');
                 return;
@@ -214,7 +209,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
                 window.location.href = '/shop_mvc/baocao/thanhtoan.php';
             } else {
                 alert('Vui lòng đăng nhập để tiếp tục!');
-                
+
                 // Mở Modal đăng nhập nếu có
                 const loginModal = document.getElementById('formdangnhap');
                 if (loginModal && typeof bootstrap !== 'undefined') {
@@ -233,6 +228,13 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
             updateBadge();
         });
     </script>
+    <?php include __DIR__ . '/../layout/footer.php'; ?>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/style.js"></script>
+
+
 
 </body>
+
 </html>

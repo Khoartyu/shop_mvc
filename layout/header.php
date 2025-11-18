@@ -1,4 +1,102 @@
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mLoginBtn = document.getElementById('modal-tab-login');
+            const mRegisterBtn = document.getElementById('modal-tab-register');
+            const mLinkToReg = document.getElementById('modal-link-to-register');
+            const mLinkToLog = document.getElementById('modal-link-to-login');
+            const mLoginContent = document.getElementById('modal-content-login');
+            const mRegisterContent = document.getElementById('modal-content-register');
+            const mAlertMsg = document.getElementById('modal-alert-message');
 
+            if (!mLoginBtn) return;
+
+            const switchModalTab = (tab) => {
+                mAlertMsg.classList.add('d-none');
+                if (tab === 'login') {
+                    mLoginBtn.classList.add('active');
+                    mRegisterBtn.classList.remove('active');
+                    mLoginContent.classList.remove('hidden-tab');
+                    mRegisterContent.classList.add('hidden-tab');
+                } else {
+                    mRegisterBtn.classList.add('active');
+                    mLoginBtn.classList.remove('active');
+                    mRegisterContent.classList.remove('hidden-tab');
+                    mLoginContent.classList.add('hidden-tab');
+                }
+            };
+
+            mLoginBtn.addEventListener('click', () => switchModalTab('login'));
+            mRegisterBtn.addEventListener('click', () => switchModalTab('register'));
+            mLinkToReg.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchModalTab('register');
+            });
+            mLinkToLog.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchModalTab('login');
+            });
+
+            const showModalAlert = (type, message) => {
+                mAlertMsg.classList.remove('d-none', 'alert-danger', 'alert-success', 'alert-dark');
+                if (type === 'error') mAlertMsg.classList.add('alert-danger');
+                else if (type === 'success') mAlertMsg.classList.add('alert-success');
+                else mAlertMsg.classList.add('alert-dark'); // Dùng alert tối màu cho loading
+                mAlertMsg.innerHTML = message;
+            };
+
+            // --- API CALLS (Giữ nguyên logic cũ) ---
+            document.getElementById('modalLoginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                showModalAlert('loading', '<i class="fas fa-spinner fa-spin"></i> Đang kiểm tra...');
+                try {
+                    const response = await fetch('/shop_mvc/api/index.php?action=login', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        showModalAlert('success', 'Đăng nhập thành công!');
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 1000);
+                    } else {
+                        showModalAlert('error', data.message);
+                    }
+                } catch (err) {
+                    showModalAlert('error', 'Lỗi kết nối server!');
+                }
+            });
+
+            document.getElementById('modalRegisterForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                if (formData.get('mat_khau_reg') !== formData.get('xac_nhan_mat_khau')) {
+                    showModalAlert('error', 'Mật khẩu không khớp!');
+                    return;
+                }
+                showModalAlert('loading', 'Đang đăng ký...');
+                try {
+                    const response = await fetch('/shop_mvc/api/index.php?action=register', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        showModalAlert('success', data.message);
+                        setTimeout(() => {
+                            switchModalTab('login');
+                            e.target.reset();
+                        }, 1500);
+                    } else {
+                        showModalAlert('error', data.message);
+                    }
+                } catch (err) {
+                    showModalAlert('error', 'Lỗi kết nối server!');
+                }
+            });
+        });
+    </script>
     <header class="sticky-top">
         <nav class="navbar navbar-expand-lg navbar-dark" style="background:#343a40; font-size: 15px;">
             <div class="container">
@@ -212,202 +310,4 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const mLoginBtn = document.getElementById('modal-tab-login');
-            const mRegisterBtn = document.getElementById('modal-tab-register');
-            const mLinkToReg = document.getElementById('modal-link-to-register');
-            const mLinkToLog = document.getElementById('modal-link-to-login');
-            const mLoginContent = document.getElementById('modal-content-login');
-            const mRegisterContent = document.getElementById('modal-content-register');
-            const mAlertMsg = document.getElementById('modal-alert-message');
 
-            if (!mLoginBtn) return;
-
-            const switchModalTab = (tab) => {
-                mAlertMsg.classList.add('d-none');
-                if (tab === 'login') {
-                    mLoginBtn.classList.add('active');
-                    mRegisterBtn.classList.remove('active');
-                    mLoginContent.classList.remove('hidden-tab');
-                    mRegisterContent.classList.add('hidden-tab');
-                } else {
-                    mRegisterBtn.classList.add('active');
-                    mLoginBtn.classList.remove('active');
-                    mRegisterContent.classList.remove('hidden-tab');
-                    mLoginContent.classList.add('hidden-tab');
-                }
-            };
-
-            mLoginBtn.addEventListener('click', () => switchModalTab('login'));
-            mRegisterBtn.addEventListener('click', () => switchModalTab('register'));
-            mLinkToReg.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchModalTab('register');
-            });
-            mLinkToLog.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchModalTab('login');
-            });
-
-            const showModalAlert = (type, message) => {
-                mAlertMsg.classList.remove('d-none', 'alert-danger', 'alert-success', 'alert-dark');
-                if (type === 'error') mAlertMsg.classList.add('alert-danger');
-                else if (type === 'success') mAlertMsg.classList.add('alert-success');
-                else mAlertMsg.classList.add('alert-dark'); // Dùng alert tối màu cho loading
-                mAlertMsg.innerHTML = message;
-            };
-
-            // --- API CALLS (Giữ nguyên logic cũ) ---
-            document.getElementById('modalLoginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                showModalAlert('loading', '<i class="fas fa-spinner fa-spin"></i> Đang kiểm tra...');
-                try {
-                    const response = await fetch('/shop_mvc/api/index.php?action=login', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        showModalAlert('success', 'Đăng nhập thành công!');
-                        setTimeout(() => {
-                            window.location.href = data.redirect;
-                        }, 1000);
-                    } else {
-                        showModalAlert('error', data.message);
-                    }
-                } catch (err) {
-                    showModalAlert('error', 'Lỗi kết nối server!');
-                }
-            });
-
-            document.getElementById('modalRegisterForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                if (formData.get('mat_khau_reg') !== formData.get('xac_nhan_mat_khau')) {
-                    showModalAlert('error', 'Mật khẩu không khớp!');
-                    return;
-                }
-                showModalAlert('loading', 'Đang đăng ký...');
-                try {
-                    const response = await fetch('/shop_mvc/api/index.php?action=register', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        showModalAlert('success', data.message);
-                        setTimeout(() => {
-                            switchModalTab('login');
-                            e.target.reset();
-                        }, 1500);
-                    } else {
-                        showModalAlert('error', data.message);
-                    }
-                } catch (err) {
-                    showModalAlert('error', 'Lỗi kết nối server!');
-                }
-            });
-        });
-    </script>
-    <style>
-        /* Tùy chỉnh màu sắc cho Modal */
-        .modal-content {
-            border-radius: 0;
-            /* Bo góc vuông vức sang trọng */
-        }
-
-        /* Tab Navigation */
-        .modal-nav-tabs-custom {
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .modal-tab-btn {
-            background: none;
-            border: none;
-            padding: 10px 15px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #9ca3af;
-            /* Xám nhạt */
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .modal-tab-btn:hover {
-            color: #111827;
-            /* Đen */
-        }
-
-        .modal-tab-btn.active {
-            color: #111827;
-            /* Đen đậm */
-            border-bottom-color: #111827;
-        }
-
-        /* Input Styles */
-        .form-control {
-            border-radius: 0;
-            border: 1px solid #d1d5db;
-            padding: 10px 15px;
-        }
-
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #111827;
-            /* Viền đen khi focus */
-        }
-
-        .input-group-text {
-            background-color: #f9fafb;
-            border-radius: 0;
-            border: 1px solid #d1d5db;
-            color: #6b7280;
-        }
-
-        /* Button Styles */
-        .btn-dark-custom {
-            background-color: #1f2937;
-            border-color: #1f2937;
-            border-radius: 0;
-            padding: 10px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .btn-dark-custom:hover {
-            background-color: #111827;
-            border-color: #111827;
-        }
-
-        .btn-outline-custom {
-            border-radius: 0;
-            border: 1px solid #d1d5db;
-            color: #374151;
-        }
-
-        .btn-outline-custom:hover {
-            background-color: #f3f4f6;
-            color: #111827;
-        }
-
-        .modal-tab-content.hidden-tab {
-            display: none !important;
-        }
-
-        .modal-backdrop {
-            z-index: 1060 !important;
-        }
-
-        .modal {
-            z-index: 1070 !important;
-        }
-    </style>
