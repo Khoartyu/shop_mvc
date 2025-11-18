@@ -1,15 +1,4 @@
-<!DOCTYPE html>
-<html lang="vi">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fashion Store - Thời trang</title>
-
-    <link rel="shortcut icon" href="/shop_mvc/images/Assets/logo/logoc.png" type="image/x-icon">
-</head>
-
-<body>
     <header class="sticky-top">
         <nav class="navbar navbar-expand-lg navbar-dark" style="background:#343a40; font-size: 15px;">
             <div class="container">
@@ -422,6 +411,3 @@
             z-index: 1070 !important;
         }
     </style>
-</body>
-
-</html>
