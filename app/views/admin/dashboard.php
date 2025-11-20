@@ -243,12 +243,10 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         document.getElementById('content-container').innerHTML = html;
     };
 
-    // --- 3.2 SẢN PHẨM (CÓ TÌM KIẾM) ---
+    // --- 3.2 SẢN PHẨM (CÓ TÌM KIẾM & SỬA LẠI HIỂN THỊ GIÁ) ---
     const renderProducts = async (keyword = '') => {
-        // Gọi API có kèm tham số keyword
         const products = await fetchData('adminProducts', `&keyword=${keyword}`) || [];
         
-        // Tạo thanh tìm kiếm và nút thêm
         const toolsHtml = `
             <div class="flex gap-4">
                 <div class="relative">
@@ -266,7 +264,6 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
                 </button>
             </div>`;
 
-        // Nếu không tìm thấy sản phẩm nào
         if(products.length === 0) {
             document.getElementById('content-container').innerHTML = `
                 <div class="flex justify-between items-center mb-6">
@@ -278,13 +275,19 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
                         ${keyword ? `Không tìm thấy sản phẩm nào tên là "<b>${keyword}</b>"` : 'Chưa có dữ liệu sản phẩm.'}
                     </p>
                 </div>`;
-            // Vẫn phải focus lại ô input để người dùng nhập tiếp được
             if(keyword) document.getElementById('search-product').focus();
             return;
         }
 
         const rows = products.map(p => {
             const imgSrc = p.anh_dai_dien ? `/shop_mvc/${p.anh_dai_dien.split(',')[0].trim()}` : '/shop_mvc/images/placeholder.jpg';
+            
+            // --- LOGIC GIÁ ---
+            let displayPrice = parseFloat(p.gia); 
+            if (displayPrice === 0) {
+                displayPrice = parseFloat(p.basePrice || 0);
+            }
+
             return `
             <tr class="hover:bg-gray-50 border-b transition-colors">
                 <td class="px-6 py-4 text-gray-500">#${p.id}</td>
@@ -295,7 +298,7 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
                         <div class="text-xs text-gray-500">${p.category || 'Chưa phân loại'}</div>
                     </div>
                 </td>
-                <td class="px-6 py-4 font-bold text-primary text-sm">Từ ${formatCurrency(p.basePrice || 0)}</td>
+                <td class="px-6 py-4 font-bold text-primary text-sm">${formatCurrency(displayPrice)}</td>
                 <td class="px-6 py-4 text-sm">${p.totalStock || 0}</td>
                 <td class="px-6 py-4 text-right">
                     <button onclick="openProductModal(${p.id})" class="text-blue-600 hover:bg-blue-50 p-2 rounded"><i class="fas fa-edit"></i></button>
@@ -315,7 +318,7 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">ID</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Sản phẩm</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Giá Gốc</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Giá Bán</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Tồn Kho</th>
                             <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase">Hành động</th>
                         </tr>
@@ -325,11 +328,9 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
             </div>
         `;
         
-        // Giữ focus vào ô input sau khi render lại
         const input = document.getElementById('search-product');
         if(input) {
             input.focus();
-            // Mẹo: Đưa con trỏ về cuối dòng text
             const val = input.value; 
             input.value = ''; 
             input.value = val;
@@ -337,24 +338,19 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
     };
 
     // --- HÀM XỬ LÝ SỰ KIỆN TÌM KIẾM ---
-    // (Dán hàm này xuống dưới cùng, chung chỗ với các hàm window.xxx)
     let searchTimeout = null;
     window.handleSearchProduct = (event) => {
         const keyword = event.target.value;
-
-        // Kỹ thuật Debounce: Đợi người dùng ngừng gõ 300ms mới gọi API
-        // Giúp tránh gọi API quá nhiều lần liên tục
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             renderProducts(keyword);
         }, 300);
     };
 
-    // --- 3.3 DANH MỤC (CẬP NHẬT) ---
+    // --- 3.3 DANH MỤC ---
     const renderCategories = async () => {
         const cats = await fetchData('adminCategories') || [];
         
-        // Nút Thêm
         const addButton = `
             <button onclick="openCategoryModal()" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 transition-colors flex items-center">
                 <i class="fas fa-plus mr-2"></i> Thêm Danh mục
@@ -386,19 +382,16 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
 
         renderTable('Quản lý Danh mục', ['ID', 'Tên danh mục', 'Hành động'], rows, 'Thêm Danh mục');
         
-        // Gắn lại sự kiện cho nút thêm ở header bảng (do renderTable tạo lại HTML)
-        // Mẹo nhỏ: renderTable trả về HTML string hoặc ta dùng cách querySelector sau khi render
         const headerBtn = document.querySelector('button.bg-primary'); 
         if(headerBtn && headerBtn.innerText.includes('Thêm Danh mục')) {
             headerBtn.setAttribute('onclick', 'openCategoryModal()');
         }
     };
 
-    // --- 3.4 THUỘC TÍNH (CẬP NHẬT) ---
+    // --- 3.4 THUỘC TÍNH ---
     const renderAttributes = async () => {
         const data = await fetchData('adminAttributes') || { colors: [], sizes: [] };
         
-        // Render bảng Màu
         const colorRows = data.colors.map(c => `
             <tr class="border-b hover:bg-gray-50">
                 <td class="px-4 py-2">#${c.id}</td>
@@ -413,7 +406,6 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
             </tr>
         `).join('');
 
-        // Render bảng Size
         const sizeRows = data.sizes.map(s => `
             <tr class="border-b hover:bg-gray-50">
                 <td class="px-4 py-2">#${s.id}</td>
@@ -499,7 +491,7 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         renderTable('Quản lý Khách hàng', ['ID', 'Họ tên', 'Email', 'SĐT', 'Ngày tham gia'], rows, '');
     };
 
-    // --- 3.7 USERS (QUẢN TRỊ) ---
+    // --- 3.7 USERS ---
     const renderUsers = async () => {
         const users = await fetchData('adminUsers') || [];
         const rows = users.map(u => `
@@ -522,7 +514,7 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
     };
 
     // =======================================================
-    // 4. HÀM RENDER HELPER (Tái sử dụng Table)
+    // 4. HELPER FUNCTIONS
     // =======================================================
     const renderTable = (title, headers, bodyRows, addButtonText) => {
         const headerHtml = headers.map(h => 
@@ -560,13 +552,12 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
     };
 
     // =======================================================
-    // 5. ROUTING & NAVIGATION
+    // 5. ROUTING
     // =======================================================
     const menuItems = document.querySelectorAll('.menu-item');
     const pageTitle = document.getElementById('page-title');
 
     const navigateTo = async (page) => {
-        // Update UI Active State
         menuItems.forEach(item => item.classList.remove('active-link'));
         const activeItem = document.querySelector(`.menu-item[data-page="${page}"]`);
         if (activeItem) {
@@ -574,10 +565,8 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
             pageTitle.innerText = activeItem.textContent.trim();
         }
 
-        // Show Loading
         document.getElementById('content-container').innerHTML = '<div class="flex justify-center items-center h-96"><div class="loader"></div></div>';
 
-        // Route
         switch (page) {
             case 'dashboard': await renderDashboard(); break;
             case 'products': await renderProducts(); break;
@@ -590,7 +579,6 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         }
     };
 
-    // Event Listeners
     menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -603,36 +591,32 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
     window.handleLogout = async () => {
         if (confirm('Đăng xuất khỏi hệ thống?')) {
             await fetchData('logout');
-            window.location.href = '/shop_mvc/baocao/logout.php'; // Điều chỉnh đường dẫn login của bạn
+            window.location.href = '/shop_mvc/baocao/logout.php'; 
         }
     };
 
     // =======================================================
-    // 6. LOGIC XỬ LÝ DỮ LIỆU (CRUD)
+    // 6. CRUD LOGIC
     // =======================================================
 
-    // --- HÀM XÓA CHUNG (CẬP NHẬT LẦN 2) ---
     window.deleteItem = async (type, id) => {
         if (!confirm('Bạn có chắc chắn muốn xóa không?')) return;
-
         const formData = new FormData();
         formData.append('id', id);
 
         let actionName = '';
         if (type === 'sanpham') actionName = 'xoa'; 
         if (type === 'danhmuc') actionName = 'xoaDanhmuc';
-        if (type === 'mausac') actionName = 'xoaMau';     // Mới
-        if (type === 'kichthuoc') actionName = 'xoaSize'; // Mới
+        if (type === 'mausac') actionName = 'xoaMau';
+        if (type === 'kichthuoc') actionName = 'xoaSize';
 
         try {
             const response = await fetch(`${API_URL}?action=${actionName}`, {
                 method: 'POST', body: formData
             });
             const result = await response.json();
-
             if (result.thanhcong) {
                 alert('Đã xóa thành công!');
-                // Reload lại đúng trang hiện tại
                 const currentPage = document.querySelector('.active-link').getAttribute('data-page');
                 navigateTo(currentPage);
             } else {
@@ -644,20 +628,19 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         }
     };
 
-    // --- HÀM MỞ MODAL SẢN PHẨM (THÊM & SỬA) ---
+    // --- MODAL SẢN PHẨM (ĐÃ SỬA: THÊM Ô NHẬP TỒN KHO) ---
     window.openProductModal = async (id = null) => {
         const modal = document.getElementById('app-modal');
         const modalTitle = document.getElementById('modal-title');
         const modalBody = document.getElementById('modal-body');
         
-        // Lấy danh sách danh mục để đổ vào dropdown
         const categories = await fetchData('adminCategories') || [];
         const categoryOptions = categories.map(c => `<option value="${c.id}">${c.ten_danhmuc}</option>`).join('');
 
-        let productData = { ten_san_pham: '', mo_ta: '', danhmuc_id: '', anh_dai_dien: '' };
+        // Thêm so_luong vào biến mặc định
+        let productData = { ten_san_pham: '', gia: 0, so_luong: 0, mo_ta: '', danhmuc_id: '', anh_dai_dien: '' };
         let isEdit = false;
 
-        // Nếu có ID -> Chế độ Sửa -> Lấy dữ liệu cũ
         if (id) {
             isEdit = true;
             modalTitle.innerText = "Cập nhật Sản phẩm";
@@ -667,7 +650,6 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
             modalTitle.innerText = "Thêm Sản phẩm mới";
         }
 
-        // Render Form vào Modal Body
         modalBody.innerHTML = `
             <form id="product-form" class="space-y-4">
                 ${isEdit ? `<input type="hidden" name="id" value="${id}">` : ''}
@@ -675,7 +657,20 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Tên sản phẩm</label>
                     <input type="text" name="ten_san_pham" value="${productData.ten_san_pham}" required 
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Giá bán (VNĐ)</label>
+                        <input type="number" name="gia" value="${productData.gia || 0}" required min="0" step="1000"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 font-bold text-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Số lượng kho</label>
+                        <input type="number" name="so_luong" value="${productData.so_luong || 0}" required min="0"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 font-bold text-gray-800">
+                    </div>
                 </div>
 
                 <div>
@@ -687,10 +682,10 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Đường dẫn ảnh (VD: images/sanpham/a.jpg)</label>
+                    <label class="block text-sm font-medium text-gray-700">Đường dẫn ảnh</label>
                     <input type="text" name="anh_dai_dien" value="${productData.anh_dai_dien}" 
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-                    <p class="text-xs text-gray-500 mt-1">*Tạm thời nhập đường dẫn, chức năng upload ảnh sẽ làm sau.</p>
+                    <p class="text-xs text-gray-500 mt-1">*Tạm thời nhập đường dẫn.</p>
                 </div>
 
                 <div>
@@ -706,44 +701,32 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
             </form>
         `;
 
-        // Chọn đúng danh mục trong select box nếu đang sửa
         if(isEdit && productData.danhmuc_id) {
             document.querySelector('select[name="danhmuc_id"]').value = productData.danhmuc_id;
         }
 
-        // Xử lý khi bấm nút Submit (Lưu)
         document.getElementById('product-form').addEventListener('submit', async (e) => {
-            e.preventDefault(); // Chặn load lại trang
-            
+            e.preventDefault();
             const formData = new FormData(e.target);
-            const action = isEdit ? 'capNhat' : 'them'; // Chọn action API tương ứng
+            const action = isEdit ? 'capNhat' : 'them';
             
             try {
-                const res = await fetch(`${API_URL}?action=${action}`, {
-                    method: 'POST',
-                    body: formData
-                });
+                const res = await fetch(`${API_URL}?action=${action}`, { method: 'POST', body: formData });
                 const result = await res.json();
-                
                 if (result.thanhcong) {
                     alert(result.thongbao);
                     closeModal();
-                    renderProducts(); // Tải lại danh sách
+                    renderProducts(); 
                 } else {
-                    alert('Lỗi: ' + result.thongbao);
+                    alert(result.thongbao);
                 }
-            } catch (err) {
-                console.error(err);
-                alert('Lỗi hệ thống!');
-            }
+            } catch (err) { console.error(err); }
         });
 
-        // Hiển thị Modal
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     };
 
-    // --- HÀM MỞ MODAL DANH MỤC ---
     window.openCategoryModal = async (id = null) => {
         const modal = document.getElementById('app-modal');
         const modalTitle = document.getElementById('modal-title');
@@ -755,7 +738,6 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         if (id) {
             isEdit = true;
             modalTitle.innerText = "Cập nhật Danh mục";
-            // Gọi API lấy chi tiết danh mục
             const res = await fetchData('getCategoryDetail', `&id=${id}`);
             if(res) data = res;
         } else {
@@ -765,19 +747,14 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         modalBody.innerHTML = `
             <form id="category-form" class="space-y-4">
                 ${isEdit ? `<input type="hidden" name="id" value="${id}">` : ''}
-                
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Tên danh mục</label>
-                    <input type="text" name="ten_danhmuc" value="${data.ten_danhmuc}" required 
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    <input type="text" name="ten_danhmuc" value="${data.ten_danhmuc}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Link ảnh (VD: images/danhmuc/a.jpg)</label>
-                    <input type="text" name="hinh_anh" value="${data.hinh_anh}" 
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    <input type="text" name="hinh_anh" value="${data.hinh_anh}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
                 </div>
-
                 <div class="flex justify-end pt-4">
                     <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
                         ${isEdit ? 'Lưu Thay Đổi' : 'Thêm Mới'}
@@ -790,7 +767,6 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
             e.preventDefault();
             const formData = new FormData(e.target);
             const action = isEdit ? 'capNhatDanhmuc' : 'themDanhmuc';
-            
             try {
                 const res = await fetch(`${API_URL}?action=${action}`, { method: 'POST', body: formData });
                 const result = await res.json();
@@ -808,47 +784,35 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         modal.classList.add('flex');
     };
 
-    // --- HÀM MỞ MODAL THUỘC TÍNH (MÀU HOẶC SIZE) ---
     window.openAttributeModal = (type) => {
         const modal = document.getElementById('app-modal');
         const modalTitle = document.getElementById('modal-title');
         const modalBody = document.getElementById('modal-body');
-        
         const isColor = (type === 'color');
-        
         modalTitle.innerText = isColor ? "Thêm Màu Sắc Mới" : "Thêm Kích Thước Mới";
 
-        // Giao diện Form sẽ thay đổi tùy theo loại (Màu thì có chọn màu, Size thì không)
         modalBody.innerHTML = `
             <form id="attr-form" class="space-y-4">
-                
                 <div>
                     <label class="block text-sm font-medium text-gray-700">
                         ${isColor ? 'Tên màu (Vd: Xanh Dương)' : 'Tên kích thước (Vd: XL, 42)'}
                     </label>
-                    <input type="text" name="${isColor ? 'ten_mau' : 'ten_kich_thuoc'}" required 
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary">
+                    <input type="text" name="${isColor ? 'ten_mau' : 'ten_kich_thuoc'}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary">
                 </div>
-
                 ${isColor ? `
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Mã màu (Chọn màu)</label>
                     <div class="flex items-center mt-1 space-x-2">
                         <input type="color" id="color-picker" class="h-10 w-10 border border-gray-300 rounded cursor-pointer" value="#000000">
-                        <input type="text" name="ma_hex" id="hex-input" value="#000000" 
-                            class="block w-full border border-gray-300 rounded-md shadow-sm p-2 uppercase">
+                        <input type="text" name="ma_hex" id="hex-input" value="#000000" class="block w-full border border-gray-300 rounded-md shadow-sm p-2 uppercase">
                     </div>
                 </div>` : ''}
-
                 <div class="flex justify-end pt-4">
-                    <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                        Thêm Mới
-                    </button>
+                    <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">Thêm Mới</button>
                 </div>
             </form>
         `;
 
-        // Logic đồng bộ giữa Color Picker và Input Text (Chỉ chạy khi là Màu)
         if (isColor) {
             const picker = document.getElementById('color-picker');
             const input = document.getElementById('hex-input');
@@ -856,19 +820,17 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
             input.addEventListener('input', (e) => picker.value = e.target.value);
         }
 
-        // Xử lý Submit
         document.getElementById('attr-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const action = isColor ? 'themMau' : 'themSize';
-            
             try {
                 const res = await fetch(`${API_URL}?action=${action}`, { method: 'POST', body: formData });
                 const result = await res.json();
                 if (result.thanhcong) {
                     alert(result.thongbao);
                     closeModal();
-                    renderAttributes(); // Tải lại bảng
+                    renderAttributes(); 
                 } else {
                     alert(result.thongbao);
                 }
@@ -883,5 +845,4 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
     window.onload = () => navigateTo('dashboard');
     </script>
 </body>
-
 </html>

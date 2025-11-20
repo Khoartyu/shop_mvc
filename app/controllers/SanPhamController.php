@@ -51,34 +51,35 @@ class SanPhamController
     // 🟠 Thêm sản phẩm
     public function them()
     {
-        // 1. SỬA: Lấy 4 trường (thêm 'danhmuc_id')
+        // Lấy dữ liệu
         $ten = $_POST['ten_san_pham'] ?? '';
+        $gia = $_POST['gia'] ?? 0;
+        $sl = $_POST['so_luong'] ?? 0;
         $mo_ta = $_POST['mo_ta'] ?? '';
         $anh_dai_dien = $_POST['anh_dai_dien'] ?? '';
-        $danhmuc_id = $_POST['danhmuc_id'] ?? null; // Lấy 'danhmuc_id'
+        $danhmuc_id = $_POST['danhmuc_id'] ?? null;
 
-        // 2. SỬA: Gọi hàm service với 4 tham số
-        $ketQua = $this->service->themSanPham($ten, $mo_ta, $anh_dai_dien, $danhmuc_id);
+        // Gọi service
+        $ketQua = $this->service->themSanPham($ten, $gia, $sl, $mo_ta, $anh_dai_dien, $danhmuc_id);
 
+        // Trả về JSON
         header('Content-Type: application/json');
         echo json_encode($ketQua);
     }
 
     // 🟣 Cập nhật sản phẩm
-    public function capNhat()
-    {
-        // 1. SỬA: Lấy 5 trường (thêm 'danhmuc_id')
+    public function capNhat() {
         $id = $_POST['id'] ?? 0;
         $ten = $_POST['ten_san_pham'] ?? '';
+        $gia = $_POST['gia'] ?? 0;
+        $sl = $_POST['so_luong'] ?? 0; // Lấy số lượng
         $mo_ta = $_POST['mo_ta'] ?? '';
-        $anh_dai_dien = $_POST['anh_dai_dien'] ?? '';
-        $danhmuc_id = $_POST['danhmuc_id'] ?? null; // Lấy 'danhmuc_id'
+        $anh = $_POST['anh_dai_dien'] ?? '';
+        $dm = $_POST['danhmuc_id'] ?? null;
 
-        // 2. SỬA: Gọi hàm service với 5 tham số
-        $ketQua = $this->service->capNhatSanPham($id, $ten, $mo_ta, $anh_dai_dien, $danhmuc_id);
-
+        $res = $this->service->capNhatSanPham($id, $ten, $gia, $sl, $mo_ta, $anh, $dm);
         header('Content-Type: application/json');
-        echo json_encode($ketQua);
+        echo json_encode($res);
     }
 
     // 🔴 Xóa sản phẩm

@@ -30,16 +30,20 @@ class AdminRepository {
         return $kpis;
     }
 
-    // 2. Lấy danh sách Sản phẩm (Có hỗ trợ tìm kiếm)
+    // 2. Lấy danh sách Sản phẩm (ĐÃ SỬA LOGIC TỒN KHO)
     public function getAllProducts($keyword = '') {
+        // Logic: Nếu có biến thể thì tính tổng biến thể. Nếu không có thì lấy số lượng gốc.
         $sql = "SELECT s.*, d.ten_danhmuc as category, 
-                  (SELECT SUM(so_luong_ton) FROM bienthe_sanpham WHERE sanpham_id = s.id) as totalStock,
-                  (SELECT COUNT(*) FROM bienthe_sanpham WHERE sanpham_id = s.id) as variantCount,
+                  CASE 
+                    WHEN (SELECT COUNT(*) FROM bienthe_sanpham WHERE sanpham_id = s.id) > 0 
+                    THEN (SELECT SUM(so_luong_ton) FROM bienthe_sanpham WHERE sanpham_id = s.id)
+                    ELSE s.so_luong 
+                  END as totalStock,
+                  
                   (SELECT MIN(gia) FROM bienthe_sanpham WHERE sanpham_id = s.id) as basePrice
                   FROM sanpham s 
                   LEFT JOIN danhmuc d ON s.danhmuc_id = d.id";
 
-        // Nếu có từ khóa thì thêm điều kiện WHERE
         if (!empty($keyword)) {
             $sql .= " WHERE s.ten_san_pham LIKE :keyword";
         }
@@ -48,7 +52,6 @@ class AdminRepository {
 
         $stmt = $this->conn->prepare($sql);
 
-        // Gán giá trị cho tham số :keyword
         if (!empty($keyword)) {
             $keyword = "%$keyword%";
             $stmt->bindParam(':keyword', $keyword);

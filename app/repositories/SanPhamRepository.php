@@ -18,30 +18,35 @@ class SanPhamRepository
     // =================================================================
 
     /**
-     * 🟢 1. Lấy tất cả sản phẩm (Kèm giá thấp nhất từ bảng biến thể)
+     * 🟢 1. Lấy tất cả sản phẩm
+     * (ĐÃ SỬA: Ưu tiên lấy giá biến thể, nếu không có thì lấy giá gốc)
      */
     public function getAll()
     {
+        // COALESCE(a, b): Nếu a có giá trị thì lấy a, nếu a là NULL thì lấy b
         $query = "
             SELECT 
                 s.*, 
-                (SELECT MIN(b.gia) 
-                 FROM bienthe_sanpham b 
-                 WHERE b.sanpham_id = s.id) AS gia
+                COALESCE(
+                    (SELECT MIN(b.gia) FROM bienthe_sanpham b WHERE b.sanpham_id = s.id), 
+                    s.gia
+                ) AS gia
             FROM sanpham s 
             ORDER BY s.ngay_cap_nhat DESC
         ";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 1. Tìm giá biến thể trước
+        // 2. Nếu (1) là NULL, thì lấy giá gốc này
     }
 
     /**
-     * 🟢 2. (MỚI) Lấy danh sách Banner (Slider & Quảng cáo)
+     * 🟢 2. Lấy danh sách Banner
      */
     public function getBanners()
     {
-        // Chỉ lấy banner đang hiện (hien_thi = 1), sắp xếp theo thứ tự
         $query = "SELECT * FROM banners WHERE hien_thi = 1 ORDER BY thu_tu ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -49,7 +54,7 @@ class SanPhamRepository
     }
 
     /**
-     * 🟢 3. (MỚI) Lấy danh sách Danh mục (Cho Carousel Danh mục)
+     * 🟢 3. Lấy danh sách Danh mục
      */
     public function getCategories()
     {
@@ -64,7 +69,7 @@ class SanPhamRepository
     // =================================================================
 
     /**
-     * 🟡 4. Lấy chi tiết 1 sản phẩm (Kèm tên danh mục)
+     * 🟡 4. Lấy chi tiết 1 sản phẩm
      */
     public function getById($id)
     {
@@ -79,14 +84,14 @@ class SanPhamRepository
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            // Truyền mảng $row vào Model SanPham mới
             return new SanPham($row);
         }
         return null;
     }
 
     /**
-     * 🟡 5. Lấy sản phẩm liên quan (Cùng danh mục, trừ chính nó)
+     * 🟡 5. Lấy sản phẩm liên quan
+     * (ĐÃ SỬA: Ưu tiên lấy giá biến thể, nếu không có thì lấy giá gốc)
      */
     public function getByCategoryId($danhmuc_id, $exclude_id, $limit = 3)
     {
@@ -97,9 +102,10 @@ class SanPhamRepository
         $query = "
             SELECT 
                 s.*, 
-                (SELECT MIN(b.gia) 
-                 FROM bienthe_sanpham b 
-                 WHERE b.sanpham_id = s.id) AS gia
+                COALESCE(
+                    (SELECT MIN(b.gia) FROM bienthe_sanpham b WHERE b.sanpham_id = s.id),
+                    s.gia
+                ) AS gia
             FROM sanpham s 
             WHERE s.danhmuc_id = ? AND s.id != ?
             LIMIT ?
@@ -118,23 +124,21 @@ class SanPhamRepository
     // CÁC HÀM CRUD CHO ADMIN (GIAI ĐOẠN 4)
     // =================================================================
 
-    // 🟠 Thêm sản phẩm mới
-    public function insert($ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id)
-    {
-        $query = "INSERT INTO sanpham (ten_san_pham, mo_ta, anh_dai_dien, danhmuc_id, ngay_tao, ngay_cap_nhat)
-                  VALUES (?, ?, ?, ?, NOW(), NOW())";
+    // 🟠 Thêm sản phẩm (Thêm so_luong)
+    public function insert($ten, $gia, $so_luong, $mo_ta, $anh, $dm_id) {
+        $query = "INSERT INTO sanpham (ten_san_pham, gia, so_luong, mo_ta, anh_dai_dien, danhmuc_id, ngay_tao, ngay_cap_nhat)
+                  VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id]);
+        return $stmt->execute([$ten, $gia, $so_luong, $mo_ta, $anh, $dm_id]);
     }
 
-    // 🟣 Cập nhật sản phẩm
-    public function update($id, $ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id)
-    {
+    // 🟣 Cập nhật sản phẩm (Thêm so_luong)
+    public function update($id, $ten, $gia, $so_luong, $mo_ta, $anh, $dm_id) {
         $query = "UPDATE sanpham 
-                  SET ten_san_pham=?, mo_ta=?, anh_dai_dien=?, danhmuc_id=?, ngay_cap_nhat=NOW()
+                  SET ten_san_pham=?, gia=?, so_luong=?, mo_ta=?, anh_dai_dien=?, danhmuc_id=?, ngay_cap_nhat=NOW()
                   WHERE id=?";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$ten_san_pham, $mo_ta, $anh_dai_dien, $danhmuc_id, $id]);
+        return $stmt->execute([$ten, $gia, $so_luong, $mo_ta, $anh, $dm_id, $id]);
     }
 
     // 🔴 Xóa sản phẩm
