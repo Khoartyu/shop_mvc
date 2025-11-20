@@ -140,7 +140,7 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
 
             <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4">Hệ thống</p>
             <a href="#" data-page="users" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
-                <i class="fas fa-user-shield w-6 text-center mr-2"></i> Tài khoản Admin
+                <i class="fas fa-user-shield w-6 text-center mr-2"></i>Quản Lý Tài khoản
             </a>
         </nav>
     </aside>
@@ -329,7 +329,8 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
         };
 
         // --- RENDER: Placeholder (Cho các trang chưa làm) ---
-        const renderPlaceholder = (title, icon) => {
+        const 
+        renderPlaceholder = (title, icon) => {
             document.getElementById('content-container').innerHTML = `
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">${title}</h2>
                 <div class="flex flex-col items-center justify-center h-96 bg-white rounded-xl border-2 border-dashed border-gray-300">
@@ -384,7 +385,7 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
                     renderPlaceholder('Quản lý Khách hàng', 'fas fa-users');
                     break;
                 case 'users':
-                    renderPlaceholder('Quản lý Tài khoản Admin', 'fas fa-user-shield');
+                    renderPlaceholder('Quản lý Tài khoản', 'fas fa-user-shield');
                     break;
                 default:
                     await renderDashboard();
