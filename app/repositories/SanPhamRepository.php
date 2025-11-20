@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . "/../models/SanPham.php";
 require_once __DIR__ . "/../../config/database.php";
 

@@ -2,61 +2,71 @@
 // Tệp: /api/index.php
 require_once __DIR__ . "/../config/session.php";
 header(header: "Content-Type: application/json; charset=utf-8");
+
 require_once __DIR__ . "/../app/controllers/SanPhamController.php";
 require_once __DIR__ . '/../app/controllers/AdminController.php';
 require_once __DIR__ . "/../app/controllers/AuthController.php"; // [MỚI]
 
 $action = $_GET['action'] ?? '';
+
 $adminController = new AdminController();
 $authController = new AuthController(); // [MỚI]
 $controller = new SanPhamController();
 
 switch ($action) {
-    // 🟢 Giai đoạn 1: Lấy tất cả (Đã đúng)
+
+    // 🟢 Lấy tất cả sản phẩm
     case 'layTatCa':
         $controller->layTatCa();
         break;
 
-    // 🟡 Giai đoạn 2: Lấy theo ID
-    // SỬA LỖI 1: Tên 'action' phải là 'getById' để khớp với JS và Controller
-    case 'getById': 
-        // SỬA LỖI 2: Chỉ cần gọi hàm, Controller sẽ tự lấy $_GET['id']
-        $controller->getById(); 
+    // 🔵 Lấy theo ID (Controller tự xử lý $_GET['id'])
+    case 'getById':
+        $controller->getById();
         break;
 
-    // 🟠 Giai đoạn 4: Thêm (Đã đúng)
+    // 🟠 Thêm sản phẩm
     case 'them':
         $controller->them();
         break;
 
-    // 🟣 Giai đoạn 4: Cập nhật (Đã đúng)
+    // 🟣 Cập nhật sản phẩm
     case 'capNhat':
         $controller->capNhat();
         break;
 
-    // 🔴 Giai đoạn 4: Xóa (Đã đúng)
+    // 🔴 Xóa sản phẩm
     case 'xoa':
         $controller->xoa();
         break;
-    
-    case 'adminKPIs': // Lấy số liệu Dashboard
+
+    // 📊 Lấy số liệu Dashboard
+    case 'adminKPIs':
         $adminController->getDashboardData();
         break;
 
-    case 'adminProducts': // Lấy danh sách sản phẩm quản trị
+    // 📦 Lấy danh sách sản phẩm trang admin
+    case 'adminProducts':
         $adminController->getProductList();
-        break;    
+        break;  
+
+    // 🔐 Xử lý Login
     case 'login':
         $authController->login();
         break;
-    case 'register': // [MỚI]
+
+    // 🆕 Đăng ký
+    case 'register':
         $authController->register();
         break;
+
+    // 🔓 Logout
     case 'logout':
         $authController->logout();
         break;
+
     default:
-        http_response_code(404); // Thêm mã lỗi 404
+        http_response_code(404);
         echo json_encode(["thong_bao" => "Không có hành động (action) hợp lệ!"]);
 }
 ?>

@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-// Kiểm tra đăng nhập
+// Kiểm tra đăng nhập (để xử lý nút Thanh toán)
 $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
 ?>
 
@@ -19,6 +19,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
     <link rel="stylesheet" href="../css/style.css">
 
     <script>
+        // Biến toàn cục kiểm tra trạng thái đăng nhập từ PHP
         const checkLoginString = "<?php echo $isUserLoggedIn; ?>";
         const isLoggedIn = (checkLoginString === "true");
     </script>
@@ -41,9 +42,9 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
 
         <div class="row">
             <div class="col-12">
-                <section class="cart-section">
+                <section class="cart-section mb-5">
                     <div class="container">
-                        <h2 class="mb-4">Giỏ hàng của bạn</h2>
+                        <h2 class="mb-4 fw-bold text-uppercase">Giỏ hàng của bạn</h2>
 
                         <div class="row">
                             <div class="col-lg-8">
@@ -55,24 +56,30 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
                             </div>
 
                             <div class="col-lg-4">
-                                <div class="card">
+                                <div class="card shadow-sm border-0">
                                     <div class="card-body">
-                                        <h5 class="card-title mb-3">Tổng đơn hàng</h5>
+                                        <h5 class="card-title mb-3 fw-bold">Tóm tắt đơn hàng</h5>
                                         <div class="d-flex justify-content-between mb-2">
                                             <span>Tạm tính:</span>
-                                            <span id="cart-temp-total">0đ</span>
+                                            <span id="cart-temp-total" class="fw-bold">0đ</span>
                                         </div>
                                         <div class="d-flex justify-content-between mb-3">
                                             <span>Phí vận chuyển:</span>
-                                            <span>Miễn phí</span>
+                                            <span class="text-success">Miễn phí</span>
                                         </div>
                                         <hr>
-                                        <div class="d-flex justify-content-between fw-bold mb-4">
+                                        <div class="d-flex justify-content-between fw-bold mb-4 fs-5">
                                             <span>Tổng cộng:</span>
                                             <span class="text-danger" id="cart-final-total">0đ</span>
                                         </div>
-                                        <a href="#" id="btn-checkout" class="btn btn-primary w-100 mb-2">Tiến hành thanh toán</a>
-                                        <a href="../index.php" class="btn btn-outline-secondary w-100">Tiếp tục mua sắm</a>
+                                        
+                                        <button id="btn-checkout" class="btn btn-dark w-100 mb-2 py-2 text-uppercase fw-bold">
+                                            Tiến hành thanh toán
+                                        </button>
+                                        
+                                        <a href="../index.php" class="btn btn-outline-secondary w-100">
+                                            <i class="fa-solid fa-arrow-left"></i> Tiếp tục mua sắm
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -82,61 +89,79 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
             </div>
         </div>
     </main>
+
+    <?php include __DIR__ . '/../layout/footer.php'; ?>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/style.js"></script>
+    
+    <script src="../js/cart.js"></script>
+
     <script>
+        // Định nghĩa lại key cho khớp với file cart.js
+        const CART_STORAGE_KEY = 'shopping_cart';
+
         // 1. Hàm hiển thị giỏ hàng
         function renderCartPage() {
             const container = document.getElementById('cart-items-container');
             if (!container) return;
 
-            // QUAN TRỌNG: Sửa key thành 'cart' cho khớp với LocalStorage của bạn
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            // Lấy dữ liệu từ Key 'shopping_cart' thay vì 'cart'
+            let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
 
-            container.innerHTML = ''; // Xóa chữ đang tải
+            container.innerHTML = ''; // Xóa nội dung loading
 
             // Nếu giỏ hàng trống
             if (cart.length === 0) {
-                container.innerHTML = '<div class="alert alert-warning text-center">Giỏ hàng của bạn đang trống.</div>';
+                container.innerHTML = `
+                    <div class="alert alert-light text-center border shadow-sm py-5">
+                        <img src="/shop_mvc/images/empty-cart.png" width="100" alt="Empty" style="opacity: 0.5;">
+                        <h5 class="mt-3">Giỏ hàng của bạn đang trống</h5>
+                        <a href="../index.php" class="btn btn-dark mt-3">Mua sắm ngay</a>
+                    </div>`;
                 updateTotals(0);
                 return;
             }
 
             let totalMoney = 0;
 
-            // Duyệt qua sản phẩm
+            // Duyệt qua sản phẩm để vẽ HTML
             cart.forEach((item, index) => {
-                // Ép kiểu số để tính toán không bị lỗi NaN
+                // Ép kiểu số an toàn
                 let price = Number(item.price) || 0;
                 let qty = Number(item.quantity) || 0;
                 let itemTotal = price * qty;
 
                 totalMoney += itemTotal;
 
-                // Xử lý ảnh (nếu link ảnh lỗi hoặc rỗng)
                 let imageSrc = item.image ? item.image : '/shop_mvc/images/placeholder.jpg';
 
-                // Vẽ HTML
                 container.innerHTML += `
-                    <div class="card mb-3 shadow-sm">
+                    <div class="card mb-3 border-0 shadow-sm">
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col-3 col-md-2">
-                                    <img src="${imageSrc}" class="img-fluid rounded" alt="${item.name}">
+                                    <img src="${imageSrc}" class="img-fluid rounded" alt="${item.name}" style="width: 100%; height: 80px; object-fit: cover;">
                                 </div>
-                                <div class="col-9 col-md-5">
-                                    <h6 class="mb-1 text-truncate">${item.name}</h6>
+                                
+                                <div class="col-9 col-md-4">
+                                    <h6 class="mb-1 text-dark fw-bold text-truncate">${item.name}</h6>
                                     <small class="text-muted">Đơn giá: ${price.toLocaleString('vi-VN')}đ</small>
                                 </div>
+
                                 <div class="col-6 col-md-3 mt-3 mt-md-0">
-                                    <div class="input-group input-group-sm">
-                                        <button class="btn btn-outline-secondary" onclick="updateQuantity(${index}, -1)">-</button>
-                                        <input type="text" class="form-control text-center" value="${qty}" readonly style="background-color: white;">
-                                        <button class="btn btn-outline-secondary" onclick="updateQuantity(${index}, 1)">+</button>
+                                    <div class="input-group input-group-sm" style="width: 110px;">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="updatePageQuantity(${index}, -1)">-</button>
+                                        <input type="text" class="form-control text-center border-secondary" value="${qty}" readonly style="background-color: white;">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="updatePageQuantity(${index}, 1)">+</button>
                                     </div>
                                 </div>
-                                <div class="col-6 col-md-2 mt-3 mt-md-0 text-end">
-                                    <span class="fw-bold d-block">${itemTotal.toLocaleString('vi-VN')}đ</span>
-                                    <br>
-                                    <a href="#" class="text-danger text-decoration-none small" onclick="removeItem(${index})">Xóa</a>
+
+                                <div class="col-6 col-md-3 mt-3 mt-md-0 text-end">
+                                    <span class="fw-bold text-danger d-block mb-2">${itemTotal.toLocaleString('vi-VN')}đ</span>
+                                    <button class="btn btn-sm btn-light text-muted hover-danger" onclick="removePageItem(${index})" title="Xóa">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -147,11 +172,9 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
             updateTotals(totalMoney);
         }
 
-        // 2. Hàm cập nhật số lượng
-        function updateQuantity(index, change) {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-            // Ép kiểu số trước khi cộng trừ
+        // 2. Hàm cập nhật số lượng (Dành riêng cho trang này)
+        function updatePageQuantity(index, change) {
+            let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
             let newQty = (Number(cart[index].quantity) || 0) + change;
 
             if (newQty < 1) {
@@ -162,79 +185,79 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
                 cart[index].quantity = newQty;
             }
 
-            localStorage.setItem('cart', JSON.stringify(cart));
+            // Lưu lại vào LocalStorage
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+            
+            // Re-render lại giao diện
             renderCartPage();
-            updateBadge();
-        }
-
-        // 3. Hàm xóa sản phẩm
-        function removeItem(index) {
-            if (confirm("Xóa sản phẩm này khỏi giỏ hàng?")) {
-                let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                cart.splice(index, 1);
-                localStorage.setItem('cart', JSON.stringify(cart));
-                renderCartPage();
-                updateBadge();
+            
+            // Gọi hàm updateCartIcon() từ file cart.js để cập nhật số trên Header
+            if (typeof updateCartIcon === 'function') {
+                updateCartIcon();
             }
         }
 
-        // 4. Cập nhật tổng tiền hiển thị
+        // 3. Hàm xóa sản phẩm
+        function removePageItem(index) {
+            if (confirm("Xóa sản phẩm này khỏi giỏ hàng?")) {
+                let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
+                cart.splice(index, 1);
+                
+                localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+                
+                renderCartPage();
+                
+                if (typeof updateCartIcon === 'function') {
+                    updateCartIcon();
+                }
+            }
+        }
+
+        // 4. Cập nhật hiển thị tổng tiền
         function updateTotals(amount) {
             const tempTotal = document.getElementById('cart-temp-total');
             const finalTotal = document.getElementById('cart-final-total');
-            if (tempTotal) tempTotal.textContent = amount.toLocaleString('vi-VN') + 'đ';
-            if (finalTotal) finalTotal.textContent = amount.toLocaleString('vi-VN') + 'đ';
+            const formattedMoney = amount.toLocaleString('vi-VN') + 'đ';
+            
+            if (tempTotal) tempTotal.textContent = formattedMoney;
+            if (finalTotal) finalTotal.textContent = formattedMoney;
         }
 
-        // 5. Cập nhật số lượng trên Header
-        function updateBadge() {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let count = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-
-            const badges = document.querySelectorAll('.cart-counter');
-            badges.forEach(el => el.innerText = count);
-        }
-
-        // 6. Xử lý nút thanh toán
+        // 5. Xử lý nút Thanh toán
         document.getElementById('btn-checkout').addEventListener('click', function(e) {
             e.preventDefault();
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
 
             if (cart.length === 0) {
-                alert('Giỏ hàng đang trống!');
+                alert('Giỏ hàng đang trống! Vui lòng thêm sản phẩm.');
                 return;
             }
 
             if (typeof isLoggedIn !== 'undefined' && isLoggedIn === true) {
+                // Đã đăng nhập -> Chuyển sang trang thanh toán
                 window.location.href = '/shop_mvc/baocao/thanhtoan.php';
             } else {
-                alert('Vui lòng đăng nhập để tiếp tục!');
-
-                // Mở Modal đăng nhập nếu có
-                const loginModal = document.getElementById('formdangnhap');
-                if (loginModal && typeof bootstrap !== 'undefined') {
-                    const modalInstance = new bootstrap.Modal(loginModal);
-                    modalInstance.show();
+                alert('Vui lòng đăng nhập để tiến hành thanh toán!');
+                
+                // Trigger mở Modal Đăng nhập (nếu có trong header)
+                const loginModalTrigger = document.querySelector('[data-bs-target="#formdangnhap"]');
+                if(loginModalTrigger) {
+                    loginModalTrigger.click();
                 } else {
                     window.location.href = '/shop_mvc/baocao/login.php';
                 }
             }
         });
 
-        // 7. Chạy ngay khi trang tải xong
+        // 6. Khởi chạy
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("Cart loaded with key 'cart'");
             renderCartPage();
-            updateBadge();
+            
+            // Đảm bảo badge trên header cũng được cập nhật đúng
+            if (typeof updateCartIcon === 'function') {
+                updateCartIcon();
+            }
         });
     </script>
-    <?php include __DIR__ . '/../layout/footer.php'; ?>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/style.js"></script>
-
-
-
 </body>
-
 </html>
