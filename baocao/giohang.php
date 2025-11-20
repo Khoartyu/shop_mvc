@@ -72,11 +72,11 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
                                             <span>Tổng cộng:</span>
                                             <span class="text-danger" id="cart-final-total">0đ</span>
                                         </div>
-                                        
+
                                         <button id="btn-checkout" class="btn btn-dark w-100 mb-2 py-2 text-uppercase fw-bold">
                                             Tiến hành thanh toán
                                         </button>
-                                        
+
                                         <a href="../index.php" class="btn btn-outline-secondary w-100">
                                             <i class="fa-solid fa-arrow-left"></i> Tiếp tục mua sắm
                                         </a>
@@ -94,7 +94,7 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/style.js"></script>
-    
+
     <script src="../js/cart.js"></script>
 
     <script>
@@ -115,7 +115,6 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
             if (cart.length === 0) {
                 container.innerHTML = `
                     <div class="alert alert-light text-center border shadow-sm py-5">
-                        <img src="/shop_mvc/images/empty-cart.png" width="100" alt="Empty" style="opacity: 0.5;">
                         <h5 class="mt-3">Giỏ hàng của bạn đang trống</h5>
                         <a href="../index.php" class="btn btn-dark mt-3">Mua sắm ngay</a>
                     </div>`;
@@ -187,10 +186,10 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
 
             // Lưu lại vào LocalStorage
             localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-            
+
             // Re-render lại giao diện
             renderCartPage();
-            
+
             // Gọi hàm updateCartIcon() từ file cart.js để cập nhật số trên Header
             if (typeof updateCartIcon === 'function') {
                 updateCartIcon();
@@ -202,11 +201,11 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
             if (confirm("Xóa sản phẩm này khỏi giỏ hàng?")) {
                 let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
                 cart.splice(index, 1);
-                
+
                 localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-                
+
                 renderCartPage();
-                
+
                 if (typeof updateCartIcon === 'function') {
                     updateCartIcon();
                 }
@@ -218,41 +217,71 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
             const tempTotal = document.getElementById('cart-temp-total');
             const finalTotal = document.getElementById('cart-final-total');
             const formattedMoney = amount.toLocaleString('vi-VN') + 'đ';
-            
+
             if (tempTotal) tempTotal.textContent = formattedMoney;
             if (finalTotal) finalTotal.textContent = formattedMoney;
         }
 
         // 5. Xử lý nút Thanh toán
-        document.getElementById('btn-checkout').addEventListener('click', function(e) {
+        // 5. Xử lý nút Thanh toán (Thông minh hơn)
+        document.getElementById('btn-checkout').addEventListener('click', async function(e) {
             e.preventDefault();
-            let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
 
+            // 1. Kiểm tra giỏ hàng trống
+            let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
             if (cart.length === 0) {
                 alert('Giỏ hàng đang trống! Vui lòng thêm sản phẩm.');
                 return;
             }
 
-            if (typeof isLoggedIn !== 'undefined' && isLoggedIn === true) {
-                // Đã đăng nhập -> Chuyển sang trang thanh toán
-                window.location.href = '/shop_mvc/baocao/thanhtoan.php';
-            } else {
-                alert('Vui lòng đăng nhập để tiến hành thanh toán!');
-                
-                // Trigger mở Modal Đăng nhập (nếu có trong header)
-                const loginModalTrigger = document.querySelector('[data-bs-target="#formdangnhap"]');
-                if(loginModalTrigger) {
-                    loginModalTrigger.click();
+            // 2. Gọi API kiểm tra đăng nhập thực tế (Real-time)
+            try {
+                // Giả sử bạn có nút loading để người dùng biết đang xử lý
+                const btn = e.target;
+                const originalText = btn.innerText;
+                btn.innerText = "Đang kiểm tra...";
+                btn.disabled = true;
+
+                // Gọi API kiểm tra session hiện tại
+                const response = await fetch('/shop_mvc/api/index.php?action=checkLoginStatus');
+                const data = await response.json();
+
+                // Reset nút bấm
+                btn.innerText = originalText;
+                btn.disabled = false;
+
+                if (data.logged_in === true) {
+                    // --- TRƯỜNG HỢP 1: ĐÃ ĐĂNG NHẬP ---
+                    // Chuyển sang trang thanh toán
+                    window.location.href = '/shop_mvc/baocao/thanhtoan.php';
+
                 } else {
-                    window.location.href = '/shop_mvc/baocao/login.php';
+                    // --- TRƯỜNG HỢP 2: CHƯA ĐĂNG NHẬP ---
+                    alert('Vui lòng đăng nhập để tiến hành thanh toán!');
+
+                    // Mở Modal Đăng nhập (Bootstrap 5)
+                    const loginModalEl = document.getElementById('formdangnhap');
+                    if (loginModalEl) {
+                        const modalInstance = bootstrap.Modal.getOrCreateInstance(loginModalEl);
+                        modalInstance.show();
+                    } else {
+                        // Fallback nếu không tìm thấy modal
+                        window.location.href = '/shop_mvc/baocao/login.php';
+                    }
                 }
+
+            } catch (error) {
+                console.error("Lỗi kiểm tra đăng nhập:", error);
+                alert("Có lỗi xảy ra. Vui lòng thử lại.");
+                e.target.disabled = false;
+                e.target.innerText = "Tiến hành thanh toán";
             }
         });
 
         // 6. Khởi chạy
         document.addEventListener('DOMContentLoaded', () => {
             renderCartPage();
-            
+
             // Đảm bảo badge trên header cũng được cập nhật đúng
             if (typeof updateCartIcon === 'function') {
                 updateCartIcon();
@@ -260,4 +289,5 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
         });
     </script>
 </body>
+
 </html>
