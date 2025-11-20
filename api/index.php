@@ -89,7 +89,34 @@ switch ($action) {
         $adminController->getUserList();
         break;
     
-    // ...
+    case 'themDanhmuc':
+        $adminController->themDanhmuc();
+        break;
+    case 'capNhatDanhmuc':
+        $adminController->capNhatDanhmuc();
+        break;
+    case 'xoaDanhmuc':
+        $adminController->xoaDanhmuc();
+        break;
+    case 'getCategoryDetail': // API lấy chi tiết để sửa
+        $adminController->getCategoryDetail();
+        break;
+
+    // 🎨 MÀU SẮC
+    case 'themMau':
+        $adminController->themMau();
+        break;
+    case 'xoaMau':
+        $adminController->xoaMau();
+        break;
+
+    // 📏 KÍCH THƯỚC
+    case 'themSize':
+        $adminController->themSize();
+        break;
+    case 'xoaSize':
+        $adminController->xoaSize();
+        break;
 
     default:
         http_response_code(404);
