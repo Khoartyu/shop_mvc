@@ -97,3 +97,5 @@ class SanPhamController
     // public function uploadAnh() { ... }
     // )
 }
+
+?>
