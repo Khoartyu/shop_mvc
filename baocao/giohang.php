@@ -115,7 +115,6 @@ $isUserLoggedIn = isset($_SESSION['user_id']) ? 'true' : 'false';
             if (cart.length === 0) {
                 container.innerHTML = `
                     <div class="alert alert-light text-center border shadow-sm py-5">
-                        <img src="/shop_mvc/images/empty-cart.png" width="100" alt="Empty" style="opacity: 0.5;">
                         <h5 class="mt-3">Giỏ hàng của bạn đang trống</h5>
                         <a href="../index.php" class="btn btn-dark mt-3">Mua sắm ngay</a>
                     </div>`;

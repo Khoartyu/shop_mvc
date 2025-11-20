@@ -1,27 +1,45 @@
 <?php
-// Tệp: /app/controllers/AdminController.php
-
-require_once __DIR__ . '/../services/AdminService.php';
+require_once __DIR__ . '/../repositories/AdminRepository.php';
 
 class AdminController {
-    private $adminService;
+    private $adminRepo;
 
     public function __construct() {
-        $this->adminService = new AdminService();
+        $this->adminRepo = new AdminRepository();
     }
 
-    // API trả về số liệu KPI (Doanh thu, Đơn chờ, Cảnh báo)
+    // Helper: Trả về JSON
+    private function sendJson($data) {
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+
     public function getDashboardData() {
-        $kpis = $this->adminService->getDashboardKPIs();
-        header('Content-Type: application/json');
-        echo json_encode($kpis);
+        $this->sendJson($this->adminRepo->getKPIs());
     }
 
-    // API trả về danh sách sản phẩm
     public function getProductList() {
-        $products = $this->adminService->getProductsList();
-        header('Content-Type: application/json');
-        echo json_encode($products);
+        $this->sendJson($this->adminRepo->getAllProducts());
+    }
+
+    public function getCategoryList() {
+        $this->sendJson($this->adminRepo->getAllCategories());
+    }
+
+    public function getAttributeList() {
+        $this->sendJson($this->adminRepo->getAllAttributes());
+    }
+
+    public function getOrderList() {
+        $this->sendJson($this->adminRepo->getAllOrders());
+    }
+
+    public function getCustomerList() {
+        $this->sendJson($this->adminRepo->getAllCustomers());
+    }
+
+    public function getUserList() {
+        $this->sendJson($this->adminRepo->getAllUsers());
     }
 }
 ?>

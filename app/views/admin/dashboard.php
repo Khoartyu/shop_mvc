@@ -163,258 +163,339 @@ $admin_role = $_SESSION['user_role'] ?? 'Quản trị viên';
     </div>
 
     <script>
-        // =======================================================
-        // 1. CẤU HÌNH
-        // =======================================================
-        const API_URL = '/shop_mvc/api/index.php';
-        const formatCurrency = (amount) => new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(amount);
+       // =======================================================
+    // 1. CẤU HÌNH & TIỆN ÍCH
+    // =======================================================
+    const API_URL = '/shop_mvc/api/index.php';
+    
+    const formatCurrency = (amount) => new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(amount);
 
-        // =======================================================
-        // 2. HÀM GỌI API
-        // =======================================================
-        const fetchData = async (action, params = '') => {
-            try {
-                const response = await fetch(`${API_URL}?action=${action}${params}`);
-                if (!response.ok) throw new Error('Lỗi API');
-                return await response.json();
-            } catch (error) {
-                console.error(`Error fetching ${action}:`, error);
-                return null;
-            }
+    const formatDate = (dateString) => {
+        if(!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+    };
+
+    const getStatusBadge = (status) => {
+        const colors = {
+            'Chờ xử lý': 'bg-yellow-100 text-yellow-800',
+            'Đang giao': 'bg-blue-100 text-blue-800',
+            'Đã giao': 'bg-green-100 text-green-800',
+            'Đã hủy': 'bg-red-100 text-red-800'
         };
+        return `<span class="px-2 py-1 text-xs font-bold rounded-full ${colors[status] || 'bg-gray-100'}">${status}</span>`;
+    };
 
-        // =======================================================
-        // 3. CÁC HÀM RENDER GIAO DIỆN
-        // =======================================================
+    // =======================================================
+    // 2. HÀM GỌI API
+    // =======================================================
+    const fetchData = async (action, params = '') => {
+        try {
+            const response = await fetch(`${API_URL}?action=${action}${params}`);
+            if (!response.ok) throw new Error('Lỗi API');
+            return await response.json();
+        } catch (error) {
+            console.error(`Error fetching ${action}:`, error);
+            return null;
+        }
+    };
 
-        // --- RENDER: DASHBOARD ---
-        const renderDashboard = async () => {
-            const kpis = await fetchData('adminKPIs') || {
-                revenueToday: 0,
-                ordersPending: 0,
-                stockAlerts: 0
-            };
+    // =======================================================
+    // 3. CÁC HÀM RENDER GIAO DIỆN
+    // =======================================================
 
-            const html = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-primary flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Doanh thu hôm nay</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">${formatCurrency(kpis.revenueToday)}</p>
-                        </div>
-                        <div class="p-3 bg-green-100 rounded-full text-primary"><i class="fas fa-dollar-sign fa-lg"></i></div>
+    // --- 3.1 DASHBOARD ---
+    const renderDashboard = async () => {
+        const kpis = await fetchData('adminKPIs') || { revenueToday: 0, ordersPending: 0, stockAlerts: 0 };
+        
+        const html = `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-primary flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Doanh thu hôm nay</p>
+                        <p class="text-2xl font-bold text-gray-800 mt-1">${formatCurrency(kpis.revenueToday)}</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-secondary flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Đơn chờ xử lý</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">${kpis.ordersPending}</p>
-                        </div>
-                        <div class="p-3 bg-orange-100 rounded-full text-secondary"><i class="fas fa-box-open fa-lg"></i></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500 flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Cảnh báo Tồn kho</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">${kpis.stockAlerts}</p>
-                        </div>
-                        <div class="p-3 bg-red-100 rounded-full text-red-500"><i class="fas fa-exclamation-triangle fa-lg"></i></div>
-                    </div>
+                    <div class="p-3 bg-green-100 rounded-full text-primary"><i class="fas fa-dollar-sign fa-lg"></i></div>
                 </div>
-                
-                <div class="bg-white rounded-xl shadow-sm p-8 text-center border border-gray-200">
-                    <img src="/shop_mvc/images/Assets/logo/logochinh.png" class="h-16 mx-auto mb-4" alt="Logo">
-                    <h3 class="text-lg font-medium text-gray-600">Chào mừng đến với Hệ thống Quản trị Fashion Store</h3>
-                    <p class="text-gray-400 mt-2">Vui lòng chọn chức năng từ menu bên trái để bắt đầu.</p>
-                </div>
-            `;
-            document.getElementById('content-container').innerHTML = html;
-        };
-
-        // --- RENDER: SẢN PHẨM ---
-        const renderProducts = async () => {
-            const products = await fetchData('adminProducts') || [];
-
-            if (products.length === 0) {
-                document.getElementById('content-container').innerHTML = `
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">Danh sách Sản phẩm</h2>
-                        <button class="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-green-700 transition-colors">
-                            <i class="fas fa-plus mr-2"></i> Thêm Mới
-                        </button>
+                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-secondary flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Đơn chờ xử lý</p>
+                        <p class="text-2xl font-bold text-gray-800 mt-1">${kpis.ordersPending}</p>
                     </div>
-                    <div class="text-center p-12 bg-white rounded-xl shadow-sm border">
-                        <p class="text-gray-500 mb-4">Chưa có dữ liệu sản phẩm.</p>
-                    </div>`;
-                return;
-            }
-
-            const rows = products.map(p => {
-                // Xử lý ảnh đại diện (tách chuỗi, lấy ảnh đầu, thêm đường dẫn tuyệt đối)
-                const rawImg = p.anh_dai_dien ? p.anh_dai_dien.split(',')[0].trim() : '';
-                const imgSrc = rawImg ? `/shop_mvc/${rawImg}` : '/shop_mvc/images/placeholder.jpg';
-
-                // Badge tồn kho
-                const stockBadge = p.totalStock < 10 ?
-                    `<span class="px-2 py-1 text-xs font-bold text-red-700 bg-red-100 rounded-full">Sắp hết: ${p.totalStock}</span>` :
-                    `<span class="px-2 py-1 text-xs font-bold text-green-700 bg-green-100 rounded-full">Kho: ${p.totalStock}</span>`;
-
-                return `
-                <tr class="hover:bg-gray-50 border-b transition-colors">
-                    <td class="px-6 py-4 text-gray-500">#${p.id}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                <img class="h-full w-full object-cover" src="${imgSrc}" alt="${p.name}" onerror="this.src='/shop_mvc/images/placeholder.jpg'">
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-semibold text-gray-900">${p.name}</div>
-                                <div class="text-xs text-gray-500">${p.category}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="text-sm text-primary font-bold">Từ ${formatCurrency(p.basePrice)}</div>
-                    </td>
-                    <td class="px-6 py-4">
-                        ${stockBadge}
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-600">
-                        <i class="fas fa-layer-group mr-1"></i> ${p.variantCount} biến thể
-                    </td>
-                    <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
-                        <button class="text-blue-600 hover:text-blue-900 bg-blue-50 p-2 rounded transition-colors" title="Sửa">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="text-red-600 hover:text-red-900 bg-red-50 p-2 rounded transition-colors" title="Xóa">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `
-            }).join('');
-
-            const html = `
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center gap-4">
-                        <div class="relative">
-                            <input type="text" placeholder="Tìm kiếm sản phẩm..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                        </div>
-                    </div>
-                    <button class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 transition-colors flex items-center">
-                        <i class="fas fa-plus mr-2"></i> Thêm Sản Phẩm
-                    </button>
+                    <div class="p-3 bg-orange-100 rounded-full text-secondary"><i class="fas fa-box-open fa-lg"></i></div>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Thông tin Sản phẩm</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Giá bán</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tồn kho</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">SKU</th>
-                                <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            ${rows}
-                        </tbody>
+                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Cảnh báo Tồn kho</p>
+                        <p class="text-2xl font-bold text-gray-800 mt-1">${kpis.stockAlerts}</p>
+                    </div>
+                    <div class="p-3 bg-red-100 rounded-full text-red-500"><i class="fas fa-exclamation-triangle fa-lg"></i></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-8 text-center border border-gray-200">
+                <img src="/shop_mvc/images/Assets/logo/logochinh.png" class="h-16 mx-auto mb-4" alt="Logo">
+                <h3 class="text-lg font-medium text-gray-600">Chào mừng đến với Hệ thống Quản trị</h3>
+            </div>
+        `;
+        document.getElementById('content-container').innerHTML = html;
+    };
+
+    // --- 3.2 SẢN PHẨM ---
+    const renderProducts = async () => {
+        const products = await fetchData('adminProducts') || [];
+        if(products.length === 0) return renderEmptyState('Sản phẩm');
+
+        const rows = products.map(p => {
+            const imgSrc = p.anh_dai_dien ? `/shop_mvc/${p.anh_dai_dien.split(',')[0].trim()}` : '/shop_mvc/images/placeholder.jpg';
+            return `
+            <tr class="hover:bg-gray-50 border-b transition-colors">
+                <td class="px-6 py-4 text-gray-500">#${p.id}</td>
+                <td class="px-6 py-4 flex items-center">
+                    <img class="h-10 w-10 rounded object-cover border mr-3" src="${imgSrc}" onerror="this.src='/shop_mvc/images/placeholder.jpg'">
+                    <div>
+                        <div class="text-sm font-semibold text-gray-900">${p.ten_san_pham}</div>
+                        <div class="text-xs text-gray-500">${p.category || 'Chưa phân loại'}</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 font-bold text-primary text-sm">Từ ${formatCurrency(p.basePrice || 0)}</td>
+                <td class="px-6 py-4 text-sm">${p.totalStock || 0}</td>
+                <td class="px-6 py-4 text-right">
+                    <button class="text-blue-600 hover:bg-blue-50 p-2 rounded"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteItem('sanpham', ${p.id})" class="text-red-600 hover:bg-red-50 p-2 rounded"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+        }).join('');
+        
+        renderTable('Danh sách Sản phẩm', ['ID', 'Sản phẩm', 'Giá gốc', 'Tồn kho', 'Hành động'], rows, 'Thêm Sản phẩm');
+    };
+
+    // --- 3.3 DANH MỤC ---
+    const renderCategories = async () => {
+        const cats = await fetchData('adminCategories') || [];
+        if(cats.length === 0) return renderEmptyState('Danh mục');
+
+        const rows = cats.map(c => `
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="px-6 py-4">#${c.id}</td>
+                <td class="px-6 py-4 flex items-center">
+                    <img src="/shop_mvc/${c.hinh_anh}" class="w-10 h-10 rounded-full mr-3 object-cover border">
+                    <span class="font-medium">${c.ten_danhmuc}</span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <button class="text-blue-600 p-2 hover:bg-blue-50 rounded"><i class="fas fa-edit"></i></button>
+                    <button class="text-red-600 p-2 hover:bg-red-50 rounded"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+
+        renderTable('Quản lý Danh mục', ['ID', 'Tên danh mục', 'Hành động'], rows, 'Thêm Danh mục');
+    };
+
+    // --- 3.4 THUỘC TÍNH (MÀU & SIZE) ---
+    const renderAttributes = async () => {
+        const data = await fetchData('adminAttributes') || { colors: [], sizes: [] };
+        
+        const colorRows = data.colors.map(c => `
+            <tr class="border-b">
+                <td class="px-4 py-2">#${c.id}</td>
+                <td class="px-4 py-2 flex items-center">
+                    <span class="w-6 h-6 rounded-full border mr-2 shadow-sm" style="background-color: ${c.ma_hex}"></span>
+                    ${c.ten_mau}
+                </td>
+                <td class="px-4 py-2 text-gray-500 text-xs uppercase">${c.ma_hex}</td>
+            </tr>
+        `).join('');
+
+        const sizeRows = data.sizes.map(s => `
+            <tr class="border-b">
+                <td class="px-4 py-2">#${s.id}</td>
+                <td class="px-4 py-2 font-bold">${s.ten_kich_thuoc}</td>
+            </tr>
+        `).join('');
+
+        const html = `
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Quản lý Thuộc tính</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-4 border">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                        <h3 class="font-bold text-gray-700">Màu Sắc</h3>
+                        <button class="text-sm bg-blue-100 text-blue-600 px-3 py-1 rounded hover:bg-blue-200">+ Thêm Màu</button>
+                    </div>
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50 text-gray-500"><tr><th class="px-4 py-2">ID</th><th class="px-4 py-2">Tên</th><th class="px-4 py-2">Hex</th></tr></thead>
+                        <tbody>${colorRows}</tbody>
                     </table>
                 </div>
-            `;
-            document.getElementById('content-container').innerHTML = html;
-        };
-
-        // --- RENDER: Placeholder (Cho các trang chưa làm) ---
-        const 
-        renderPlaceholder = (title, icon) => {
-            document.getElementById('content-container').innerHTML = `
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">${title}</h2>
-                <div class="flex flex-col items-center justify-center h-96 bg-white rounded-xl border-2 border-dashed border-gray-300">
-                    <div class="text-6xl text-gray-300 mb-4"><i class="${icon}"></i></div>
-                    <h3 class="text-xl font-semibold text-gray-600">Chức năng đang phát triển</h3>
-                    <p class="text-gray-500 mt-2">Vui lòng quay lại sau trong Giai đoạn tiếp theo.</p>
+                <div class="bg-white rounded-xl shadow-sm p-4 border">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                        <h3 class="font-bold text-gray-700">Kích Thước</h3>
+                        <button class="text-sm bg-blue-100 text-blue-600 px-3 py-1 rounded hover:bg-blue-200">+ Thêm Size</button>
+                    </div>
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50 text-gray-500"><tr><th class="px-4 py-2">ID</th><th class="px-4 py-2">Size</th></tr></thead>
+                        <tbody>${sizeRows}</tbody>
+                    </table>
                 </div>
-            `;
-        };
+            </div>
+        `;
+        document.getElementById('content-container').innerHTML = html;
+    };
 
-        // =======================================================
-        // 4. ĐIỀU HƯỚNG (NAVIGATION)
-        // =======================================================
-        const menuItems = document.querySelectorAll('.menu-item');
-        const contentContainer = document.getElementById('content-container');
-        const pageTitle = document.getElementById('page-title');
+    // --- 3.5 ĐƠN HÀNG ---
+    const renderOrders = async () => {
+        const orders = await fetchData('adminOrders') || [];
+        if(orders.length === 0) return renderEmptyState('Đơn hàng');
 
-        const navigateTo = async (page) => {
-            // Update Menu Active State
-            menuItems.forEach(item => item.classList.remove('active-link'));
-            const activeItem = document.querySelector(`.menu-item[data-page="${page}"]`);
-            if (activeItem) {
-                activeItem.classList.add('active-link');
-                // Cập nhật tiêu đề trang dựa trên text của menu
-                pageTitle.innerText = activeItem.textContent.trim();
-            }
+        const rows = orders.map(o => `
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="px-6 py-4 font-mono text-blue-600">#DH${o.id}</td>
+                <td class="px-6 py-4">
+                    <div class="font-medium text-gray-900">${o.ten_khach_hang || 'Khách vãng lai'}</div>
+                    <div class="text-xs text-gray-500">${formatDate(o.ngay_dat)}</div>
+                </td>
+                <td class="px-6 py-4 font-bold text-gray-800">${formatCurrency(o.tong_tien)}</td>
+                <td class="px-6 py-4">${getStatusBadge(o.trang_thai)}</td>
+                <td class="px-6 py-4 text-xs text-gray-500">${o.nhan_vien_xuly || '---'}</td>
+                <td class="px-6 py-4 text-right">
+                    <button class="text-blue-600 hover:bg-blue-50 p-2 rounded" title="Xem chi tiết"><i class="fas fa-eye"></i></button>
+                </td>
+            </tr>
+        `).join('');
 
-            // Hiển thị Loading
-            contentContainer.innerHTML = '<div class="flex justify-center items-center h-full pt-20"><div class="loader"></div></div>';
+        renderTable('Quản lý Đơn hàng', ['Mã đơn', 'Khách hàng', 'Tổng tiền', 'Trạng thái', 'NV Xử lý', 'Hành động'], rows, '');
+    };
 
-            // Giả lập delay nhỏ để hiệu ứng mượt mà hơn
-            await new Promise(r => setTimeout(r, 200));
+    // --- 3.6 KHÁCH HÀNG ---
+    const renderCustomers = async () => {
+        const customers = await fetchData('adminCustomers') || [];
+        if(customers.length === 0) return renderEmptyState('Khách hàng');
 
-            // Router Frontend
-            switch (page) {
-                case 'dashboard':
-                    await renderDashboard();
-                    break;
-                case 'products':
-                    await renderProducts();
-                    break;
-                case 'categories':
-                    renderPlaceholder('Quản lý Danh mục', 'fas fa-tags');
-                    break;
-                case 'attributes':
-                    renderPlaceholder('Quản lý Thuộc tính', 'fas fa-ruler-combined');
-                    break;
-                case 'orders':
-                    renderPlaceholder('Quản lý Đơn hàng', 'fas fa-file-invoice-dollar');
-                    break;
-                case 'customers':
-                    renderPlaceholder('Quản lý Khách hàng', 'fas fa-users');
-                    break;
-                case 'users':
-                    renderPlaceholder('Quản lý Tài khoản', 'fas fa-user-shield');
-                    break;
-                default:
-                    await renderDashboard();
-            }
-        };
+        const rows = customers.map(c => `
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="px-6 py-4">#${c.id}</td>
+                <td class="px-6 py-4 font-medium">${c.ho_ten}</td>
+                <td class="px-6 py-4 text-gray-600">${c.email}</td>
+                <td class="px-6 py-4 text-gray-600">${c.so_dien_thoai || '---'}</td>
+                <td class="px-6 py-4 text-xs text-gray-500">${formatDate(c.ngay_dang_ky)}</td>
+            </tr>
+        `).join('');
 
-        // Gắn sự kiện Click Menu
-        menuItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                navigateTo(item.getAttribute('data-page'));
-            });
+        renderTable('Quản lý Khách hàng', ['ID', 'Họ tên', 'Email', 'SĐT', 'Ngày tham gia'], rows, '');
+    };
+
+    // --- 3.7 USERS (QUẢN TRỊ) ---
+    const renderUsers = async () => {
+        const users = await fetchData('adminUsers') || [];
+        const rows = users.map(u => `
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="px-6 py-4">#${u.id}</td>
+                <td class="px-6 py-4 font-bold text-gray-700">${u.ten_dang_nhap}</td>
+                <td class="px-6 py-4">${u.ho_ten}</td>
+                <td class="px-6 py-4">
+                    <span class="px-2 py-1 rounded text-xs font-bold ${u.quyen === 'Quản trị viên' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
+                        ${u.quyen}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <button class="text-blue-600 p-2 hover:bg-blue-50 rounded"><i class="fas fa-edit"></i></button>
+                </td>
+            </tr>
+        `).join('');
+
+        renderTable('Quản lý Tài khoản hệ thống', ['ID', 'Username', 'Họ tên', 'Quyền', 'Hành động'], rows, 'Thêm Nhân viên');
+    };
+
+    // =======================================================
+    // 4. HÀM RENDER HELPER (Tái sử dụng Table)
+    // =======================================================
+    const renderTable = (title, headers, bodyRows, addButtonText) => {
+        const headerHtml = headers.map(h => 
+            `<th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">${h}</th>`
+        ).join('');
+
+        const btnHtml = addButtonText ? `
+            <button class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 transition-colors flex items-center">
+                <i class="fas fa-plus mr-2"></i> ${addButtonText}
+            </button>` : '';
+
+        const html = `
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">${title}</h2>
+                ${btnHtml}
+            </div>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 whitespace-nowrap">
+                        <thead class="bg-gray-50"><tr>${headerHtml}</tr></thead>
+                        <tbody class="bg-white divide-y divide-gray-200">${bodyRows}</tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        document.getElementById('content-container').innerHTML = html;
+    };
+
+    const renderEmptyState = (itemName) => {
+        document.getElementById('content-container').innerHTML = `
+            <div class="text-center p-12">
+                <div class="text-6xl text-gray-200 mb-4"><i class="fas fa-inbox"></i></div>
+                <h3 class="text-xl font-medium text-gray-600">Chưa có dữ liệu ${itemName}</h3>
+            </div>`;
+    };
+
+    // =======================================================
+    // 5. ROUTING & NAVIGATION
+    // =======================================================
+    const menuItems = document.querySelectorAll('.menu-item');
+    const pageTitle = document.getElementById('page-title');
+
+    const navigateTo = async (page) => {
+        // Update UI Active State
+        menuItems.forEach(item => item.classList.remove('active-link'));
+        const activeItem = document.querySelector(`.menu-item[data-page="${page}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active-link');
+            pageTitle.innerText = activeItem.textContent.trim();
+        }
+
+        // Show Loading
+        document.getElementById('content-container').innerHTML = '<div class="flex justify-center items-center h-96"><div class="loader"></div></div>';
+
+        // Route
+        switch (page) {
+            case 'dashboard': await renderDashboard(); break;
+            case 'products': await renderProducts(); break;
+            case 'categories': await renderCategories(); break;
+            case 'attributes': await renderAttributes(); break;
+            case 'orders': await renderOrders(); break;
+            case 'customers': await renderCustomers(); break;
+            case 'users': await renderUsers(); break;
+            default: await renderDashboard();
+        }
+    };
+
+    // Event Listeners
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateTo(item.getAttribute('data-page'));
         });
+    });
 
-        // Xử lý Modal & Logout
-        window.closeModal = () => {
-            document.getElementById('app-modal').classList.add('hidden');
-            document.getElementById('app-modal').classList.remove('flex');
-        };
+    window.closeModal = () => document.getElementById('app-modal').classList.add('hidden');
+    
+    window.handleLogout = async () => {
+        if (confirm('Đăng xuất khỏi hệ thống?')) {
+            await fetchData('logout');
+            window.location.href = '/shop_mvc/views/admin/login.php'; // Điều chỉnh đường dẫn login của bạn
+        }
+    };
 
-        window.handleLogout = async () => {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                await fetchData('logout');
-                window.location.href = '/shop_mvc/baocao/logout.php';
-            }
-        };
-
-        // Khởi động
-        window.onload = () => navigateTo('dashboard');
+    // Init
+    window.onload = () => navigateTo('dashboard');
     </script>
 </body>
 

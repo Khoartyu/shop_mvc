@@ -1,5 +1,5 @@
 <?php
-// Tệp: /api/index.php
+// Tệp: .../api/index.php
 require_once __DIR__ . "/../config/session.php";
 header(header: "Content-Type: application/json; charset=utf-8");
 
@@ -64,6 +64,32 @@ switch ($action) {
     case 'logout':
         $authController->logout();
         break;
+
+    case 'adminCategories':
+        $adminController->getCategoryList();
+        break;
+
+    // 🎨 Thuộc tính
+    case 'adminAttributes':
+        $adminController->getAttributeList();
+        break;
+
+    // 🧾 Đơn hàng
+    case 'adminOrders':
+        $adminController->getOrderList();
+        break;
+
+    // 👥 Khách hàng
+    case 'adminCustomers':
+        $adminController->getCustomerList();
+        break;
+
+    // 🛡️ Users (Quản trị)
+    case 'adminUsers':
+        $adminController->getUserList();
+        break;
+    
+    // ...
 
     default:
         http_response_code(404);
