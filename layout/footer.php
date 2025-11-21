@@ -317,3 +317,21 @@
             </div>
         </div>
     </footer>
+<script>
+    const API_URL = '/shop_mvc/api/index.php'; // Đảm bảo đường dẫn đúng
+
+    async function handleLogout(e) {
+        e.preventDefault();
+        if(confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+            try {
+                const response = await fetch(`${API_URL}?action=shopLogout`);
+                const result = await response.json();
+                if (result.success) {
+                    window.location.reload(); // Tải lại trang để cập nhật giao diện
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+</script>

@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -16,10 +21,10 @@
 <body>
     <?php include 'layout/header.php'; ?>
 
- 
 
 
-<main class="section-wrapper mt-3">
+
+    <main class="section-wrapper mt-3">
 
         <section id="dynamic-hero-slider" class="position-relative w-100 overflow-hidden min-h-banner">
             <div class="spinner-border text-secondary" role="status"></div>
@@ -27,15 +32,15 @@
 
         <div class="container-fluid p-0 mt-4">
             <div class="row" id="dynamic-categories">
-                </div>
-        </div>  
+            </div>
+        </div>
 
         <div id="dynamic-sub-banners" class="mt-4">
-            </div>
+        </div>
 
         <div class="container-fluid mb-5 ccr mt-5">
             <h5 class="text-center mb-4" style="font-weight:600;">Sản Phẩm Mới Nhất</h5>
-            
+
             <div class="row" id="product-list">
                 <div class="text-center w-100 py-5">
                     <div class="spinner-border text-dark" role="status"></div>
@@ -49,14 +54,15 @@
         </div>
 
     </main>
-    
+
     <!-- Footer -->
     <?php include 'layout/footer.php' ?>
 
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="/shop_mvc/js/style.js"></script>
+    <script src="/shop_mvc/js/cart.js"></script>
     <script src="/shop_mvc/js/home.js"></script>
 </body>
 
